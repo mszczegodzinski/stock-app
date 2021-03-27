@@ -1,8 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
 import dashboardReducer from './reducers/dashboardReducer';
+import { applyMiddleware, createStore } from 'redux';
+import logger from 'redux-logger';
+import thunk from 'redux-thunk';
+import { composeWithDevTools } from "redux-devtools-extension";
 
-export default configureStore({
-  reducer: {
-    dashboard: dashboardReducer,
-  },
-});
+const store = createStore(
+  dashboardReducer,
+  composeWithDevTools(applyMiddleware(thunk, logger))
+)
+
+export default store;

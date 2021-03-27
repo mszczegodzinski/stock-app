@@ -1,0 +1,20 @@
+.search-module-card {
+  animation: show-animation 0.3s linear 0.3s forwards;
+}
+
+.app-header,
+.stock-list-wrapper {
+  animation: show-animation 0.3s linear 0s forwards;
+}
+
+@keyframes show-animation {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
