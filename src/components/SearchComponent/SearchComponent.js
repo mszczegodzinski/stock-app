@@ -77,18 +77,23 @@ const SearchComponent = ({
               }
               error={stockInputError}
               onChange={(e) => handleSearchComponentChange(e)}
-              style={{ width: "350px", transition: "0.3s" }}
+              style={{ width: "300px", transition: "0.3s" }}
             />
           </Grid>
           <Grid container item xs={12} justify="center" alignItems="center">
             <Button
+              variant="outlined"
               disabled={
                 !searchedPhrase ||
                 stockInputError ||
                 isSearchedDataFetchedSuccessfully ||
                 isSearchedDataFetchedFailed
               }
-              style={{ marginTop: "30px", transition: "0.3s" }}
+              style={{
+                marginTop: "30px",
+                marginBottom: "30px",
+                transition: "0.3s",
+              }}
               onClick={handleSearchClicked}
             >
               Search
@@ -106,12 +111,13 @@ const SearchComponent = ({
           onClose={() => closeSearchDataNotification(searchedData)}
         >
           <Alert
+            icon={false}
             variant="filled"
-            color="success"
+            color={searchedData.length ? "success" : "error"}
             elevation={6}
             onClose={() => closeSearchDataNotification(searchedData)}
           >
-            {isSearchedDataFetchedSuccessfully
+            {searchedData.length
               ? "Data was fetch successfully"
               : "No result found"}
           </Alert>
