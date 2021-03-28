@@ -14,6 +14,7 @@ import StockList from "../StockList/StockList";
 import { CircularProgress } from "@material-ui/core";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import "../../utils/customStyles.css";
 
 const SearchComponent = ({
@@ -27,6 +28,13 @@ const SearchComponent = ({
 }) => {
   const [searchedPhrase, setSearchedPhrase] = useState("");
   const [stockInputError, setStockInputError] = useState(false);
+  const [market, setMarket] = useState("");
+  const [marketOptions, setMarketOptions] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  useEffect(() => {
+    setFilteredData([...searchedData]);
+  }, [searchedData]);
 
   useEffect(() => {
     if (isSearchedDataFetchedSuccessfully) {
@@ -34,8 +42,29 @@ const SearchComponent = ({
       setTimeout(() => {
         closeSearchDataNotification(searchedData);
       }, 5000);
+      // delete this timeout in return
     }
   }, [isSearchedDataFetchedSuccessfully]);
+
+  useEffect(() => {
+    // delete duplicate values:
+    if (searchedData.length) {
+      const duplicate = searchedData.map((el) => el["4. region"]);
+      const unique = new Set(duplicate);
+      setMarketOptions([...unique]);
+    }
+  }, [searchedData]);
+
+  useEffect(() => {
+    const filterResult = searchedData.filter(
+      (el) => el["4. region"] === market
+    );
+    if (filterResult.length) {
+      setFilteredData(filterResult);
+    } else {
+      setFilteredData(searchedData);
+    }
+  }, [market]);
 
   const handleSearchComponentChange = (e) => {
     console.log(e.target.value);
@@ -47,6 +76,14 @@ const SearchComponent = ({
   const handleSearchClicked = () => {
     getSearchComponentData(searchedPhrase);
     setSearchedPhrase("");
+  };
+
+  const handleSetMarket = (value) => {
+    if (value) {
+      setMarket(value);
+    } else {
+      setMarket("");
+    }
   };
 
   try {
@@ -100,7 +137,31 @@ const SearchComponent = ({
             </Button>
           </Grid>
           <Grid container item xs={12} justify="center" alignItems="center">
-            {isSearchDataLoading ? <CircularProgress /> : <StockList />}
+            <Autocomplete
+              id="filter-by-market-input"
+              value={market}
+              options={marketOptions}
+              getOptionLabel={(marketOption) => marketOption}
+              onChange={(event, newValue) => {
+                handleSetMarket(newValue);
+              }}
+              style={{ minWidth: "250px" }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Filter result by market"
+                  margin="normal"
+                />
+              )}
+            />
+          </Grid>
+          <Grid container item xs={12} justify="center" alignItems="center">
+            {isSearchDataLoading ? (
+              <CircularProgress />
+            ) : (
+              <StockList filteredData={filteredData} />
+            )}
           </Grid>
         </Grid>
         <Snackbar

@@ -2,9 +2,21 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import ErrorComponent from "../ErrorComponent/ErrorText";
+import Card from "@material-ui/core/Card";
 import "../../utils/customStyles.css";
 
-const StockList = ({ searchedData, isSearchedDataFetchedSuccessfully }) => {
+const cardStyle = {
+  marginBottom: "20px",
+  padding: "10px",
+  backgroundColor: "#777",
+  color: "#FFF",
+};
+
+const StockList = ({
+  searchedData,
+  isSearchedDataFetchedSuccessfully,
+  filteredData,
+}) => {
   const [isNoResult, setIsNoResult] = useState(false);
 
   useEffect(() => {
@@ -19,12 +31,18 @@ const StockList = ({ searchedData, isSearchedDataFetchedSuccessfully }) => {
   }, [searchedData, isSearchedDataFetchedSuccessfully]);
 
   const renderStockList = () => {
-    if (searchedData.length) {
-      const result = searchedData.map((el) => {
+    if (filteredData.length) {
+      const result = filteredData.map((el) => {
         return (
-          <Grid item xs={12}>
-            {el["2. name"]}
-          </Grid>
+          <Card style={cardStyle}>
+            <Grid item xs={12}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div>{el["1. symbol"]}</div>
+                <div>{el["2. name"]}</div>
+              </div>
+              <div>{el["4. region"]}</div>
+            </Grid>
+          </Card>
         );
       });
       return result;
@@ -45,11 +63,13 @@ const StockList = ({ searchedData, isSearchedDataFetchedSuccessfully }) => {
 
   try {
     const res = renderStockList();
+
     return (
       <div
         className={
           isNoResult || searchedData.length ? "stock-list-wrapper" : ""
         }
+        style={{ marginTop: "25px" }}
       >
         {res}
       </div>
