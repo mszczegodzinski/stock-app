@@ -7,6 +7,10 @@
   animation: show-animation 0.3s linear 0s forwards;
 }
 
+.sweet-alert > h2 {
+  display: none;
+}
+
 @keyframes show-animation {
   0% {
     opacity: 0;

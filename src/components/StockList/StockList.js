@@ -49,8 +49,8 @@ const StockList = ({
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <div>{el["1. symbol"]}</div>
-                    <div>{el["2. name"]}</div>
+                    <div style={{ marginRight: "25px" }}>{el["1. symbol"]}</div>
+                    <div style={{ textTransform: "none" }}>{el["2. name"]}</div>
                   </div>
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}

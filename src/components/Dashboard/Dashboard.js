@@ -25,13 +25,16 @@ const Dashboard = () => {
     console.log("company param ", company);
     setTransactionWindow(
       <SweetAlert
-        title={`${company["1. symbol"]}, ${company["2. name"]}`}
-        text={`${company}`}
+        title=""
         onConfirm={() => setTransactionWindow(null)}
         onCancel={() => setTransactionWindow(null)}
         showConfirm={false}
+        style={{ margin: "0 !important" }}
       >
-        <TransactionCard companySymbol={companySymbol} />
+        <TransactionCard
+          companySymbol={companySymbol}
+          title={`${company["1. symbol"]}, ${company["2. name"]}`}
+        />
       </SweetAlert>
     );
   };
