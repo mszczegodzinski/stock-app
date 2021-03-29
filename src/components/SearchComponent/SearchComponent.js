@@ -9,7 +9,7 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import utils from "../../utils/utils";
 import Grid from "@material-ui/core/Grid";
-import ErrorText from "../ErrorComponent/ErrorText";
+import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import StockList from "../StockList/StockList";
 import { CircularProgress } from "@material-ui/core";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -25,6 +25,7 @@ const SearchComponent = ({
   closeSearchDataNotification,
   setSearchDataLoading,
   searchedData,
+  showTransactionWindow,
 }) => {
   const [searchedPhrase, setSearchedPhrase] = useState("");
   const [stockInputError, setStockInputError] = useState(false);
@@ -160,7 +161,10 @@ const SearchComponent = ({
             {isSearchDataLoading ? (
               <CircularProgress />
             ) : (
-              <StockList filteredData={filteredData} />
+              <StockList
+                filteredData={filteredData}
+                showTransactionWindow={showTransactionWindow}
+              />
             )}
           </Grid>
         </Grid>
@@ -187,7 +191,9 @@ const SearchComponent = ({
     );
   } catch (error) {
     console.log("error");
-    return <ErrorText message="Search input was crashed. Try again" />;
+    return (
+      <ErrorComponent message="Search input was crashed. Try refresh page" />
+    );
   }
 };
 

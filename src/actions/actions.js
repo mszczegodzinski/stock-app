@@ -40,7 +40,7 @@ export const getSearchComponentData = (searchedPhrase) => (dispatch) => {
       return resp.json();
     })
     .then((data) => {
-      console.log("data ", data);
+      console.log("intraday data ", data);
       dispatch({ type: types.IS_SEARCH_DATA_LOADING, payload: false });
       dispatch({
         type: types.FETCH_SEARCH_ENDPOINT_DATA,
@@ -72,4 +72,25 @@ export const closeSearchDataNotification = (searchedData) => (dispatch) => {
 
 export const setSearchDataLoading = (currentValue) => (dispatch) => {
   dispatch({ type: types.IS_SEARCH_DATA_LOADING, payload: currentValue });
+};
+
+export const getOverview = (symbol) => (dispatch) => {
+  fetch(`${fetchUrl}OVERVIEW&symbol=${symbol}&apikey=${key}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((resp) => {
+      return resp.json();
+    })
+    .then((data) => {
+      console.log("overview data ", data);
+      dispatch({ type: types.FETCH_OVERVIEW_DATA_SUCCESSFULLY, payload: data });
+    })
+    .catch((err) => {
+      console.log(err);
+      dispatch({ type: types.FETCH_OVERVIEW_DATA_FAILED, payload: {} });
+    });
 };

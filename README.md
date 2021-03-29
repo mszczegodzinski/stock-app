@@ -8,9 +8,10 @@ Requirements:
 
 - They'll probably want to buy or sell a stock after getting information from your website
 
-- They can probably only operate on specific stock exchanges (e.g. European investors have trouble accessing US-based exchanges)
+* They can probably only operate on specific stock exchanges (e.g. European investors have trouble accessing US-based exchanges)
 
-- They won't always know the symbol of the company, only the name (e.g. they might not know TSLA stands for Tesla)
+* They won't always know the symbol of the company, only the name (e.g. they might not know TSLA stands for Tesla)
+
 - They will be interested in some information about the company other than just its name and price
 
 ## Requirements

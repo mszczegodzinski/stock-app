@@ -1,26 +1,49 @@
 import types from "../types";
 
 const initialState = {
-  isDataFetchedSuccessfully: false,
+  isIntradayDataFetchedSuccessfully: false,
+  isIntradayDataFetchedFailed: false,
   intradayData: {},
   isSearchedDataFetchedSuccessfully: false,
   isSearchedDataFetchedFailed: false,
   searchedData: [],
   isSearchDataLoading: false,
+  isIntradayDataLoading: false,
+  isDailyAdjustedDataLoading: false,
+  isOverviewDataFetchedSuccessfully: false,
+  isOverviewDataFetchedFailed: false,
+  overviewData: {},
 };
 
 const dashboardReducer = (state = initialState, action) => {
   switch (action.type) {
+    case types.FETCH_OVERVIEW_DATA_SUCCESSFULLY:
+      return {
+        ...state,
+        isOverviewDataFetchedSuccessfully: true,
+        isOverviewDataFetchedFailed: false,
+        overviewData: action.payload,
+      };
+    case types.FETCH_OVERVIEW_DATA_FAILED:
+      return {
+        ...state,
+        isOverviewDataFetchedSuccessfully: false,
+        isOverviewDataFetchedFailed: true,
+        overviewData: {},
+      };
     case types.FETCH_INTRADAY_DATA_SUCCESSFULLY:
       return {
         ...state,
-        isDataFetchedSuccessfully: true,
+        isIntradayDataFetchedSuccessfully: true,
+        isIntradayDataFetchedFailed: false,
         intradayData: action.payload,
       };
     case types.FETCH_INTRADAY_DATA_FAILED:
       return {
         ...state,
-        isDataFetchedSuccessfully: false,
+        isIntradayDataFetchedSuccessfully: false,
+        isIntradayDataFetchedFailed: true,
+        intradayData: {},
       };
     case types.FETCH_SEARCH_ENDPOINT_DATA:
       return {
