@@ -3,7 +3,7 @@ import types from "../types";
 const fetchUrl = "https://www.alphavantage.co/query?function=";
 const key = process.env.REACT_APP_KEY;
 
-export const getIntradayData = (symbol) => (dispatch) => {
+export const getTimeSeriesDailyAdjusted = (symbol) => (dispatch) => {
   fetch(
     `${fetchUrl}TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${key}`,
     {
@@ -18,13 +18,43 @@ export const getIntradayData = (symbol) => (dispatch) => {
       return resp.json();
     })
     .then((data) => {
-      console.log("data ", data);
-      dispatch({ type: types.FETCH_INTRADAY_DATA_SUCCESSFULLY, payload: data });
+      // console.log("time series daily adjusted ", data);
+      dispatch({
+        type: types.FETCH_TIME_SERIES_DAILY_ADJUSTED_SUCCESSFULLY,
+        payload: data,
+      });
     })
     .catch((err) => {
-      console.log(err);
-      dispatch({ type: types.FETCH_INTRADAY_DATA_FAILED });
+      dispatch({ type: types.FETCH_TIME_SERIES_DAILY_ADJUSTED_FAILED });
     });
+};
+
+export const getGlobalQuoteCompany = (symbol) => (dispatch) => {
+  resetGlobalQuoteCompany();
+  fetch(`${fetchUrl}GLOBAL_QUOTE&symbol=${symbol}&apikey=${key}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((resp) => {
+      return resp.json();
+    })
+    .then((data) => {
+      // console.log("global quote ", data);
+      dispatch({
+        type: types.FETCH_GLOBAL_QUOTE_SUCCESSFULLY,
+        payload: data,
+      });
+    })
+    .catch((err) => {
+      dispatch({ type: types.FETCH_GLOBAL_QUOTE_FAILED });
+    });
+};
+
+export const resetGlobalQuoteCompany = () => (dispatch) => {
+  dispatch({ type: types.RESET_GLOBAL_QUOTE });
 };
 
 export const getSearchComponentData = (searchedPhrase) => (dispatch) => {
@@ -40,7 +70,6 @@ export const getSearchComponentData = (searchedPhrase) => (dispatch) => {
       return resp.json();
     })
     .then((data) => {
-      console.log("intraday data ", data);
       dispatch({ type: types.IS_SEARCH_DATA_LOADING, payload: false });
       dispatch({
         type: types.FETCH_SEARCH_ENDPOINT_DATA,
@@ -50,7 +79,6 @@ export const getSearchComponentData = (searchedPhrase) => (dispatch) => {
       });
     })
     .catch((err) => {
-      console.log(err);
       dispatch({ type: types.IS_SEARCH_DATA_LOADING, payload: false });
       dispatch({
         type: types.FETCH_SEARCH_ENDPOINT_DATA,
@@ -86,11 +114,10 @@ export const getOverview = (symbol) => (dispatch) => {
       return resp.json();
     })
     .then((data) => {
-      console.log("overview data ", data);
+      // console.log("overview data ", data);
       dispatch({ type: types.FETCH_OVERVIEW_DATA_SUCCESSFULLY, payload: data });
     })
     .catch((err) => {
-      console.log(err);
       dispatch({ type: types.FETCH_OVERVIEW_DATA_FAILED, payload: {} });
     });
 };

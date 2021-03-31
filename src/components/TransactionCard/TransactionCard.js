@@ -1,107 +1,261 @@
 import Button from "@material-ui/core/Button";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { getIntradayData, getOverview } from "../../actions/actions";
+import {
+  getTimeSeriesDailyAdjusted,
+  getOverview,
+  getGlobalQuoteCompany,
+} from "../../actions/actions";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import InfoOutlined from "@material-ui/icons/InfoOutlined";
 import Grid from "@material-ui/core/Grid";
+import VolumeComponent from "../VolumeComponent/VolumeComponent";
+import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import "../../utils/customStyles.css";
 
 const buttonStyle = {
+  minWidth: "120px",
   color: "#FFF",
   fontWeight: "700",
+  padding: "12px 10px",
   fontSize: "20px",
-  minWidth: "150px",
+  display: "flex",
+  flexDirection: "row",
+  transition: "0.3s",
 };
 
 const minorTextStyle = {
-  fontWeight: "16px",
+  fontSize: "16px",
   fontWeight: "500",
+  textTransform: "none",
 };
 
 const TransactionCard = ({
-  getIntradayData,
   companySymbol,
-  intradayData,
   getOverview,
   overviewData,
   title,
+  isTimeSeriesDailyAdjustedFetchedSuccessfully,
+  isTimeSeriesDailyAdjustedFetchedFailed,
+  timesSeriesDailyAdjusted,
+  getTimeSeriesDailyAdjusted,
+  getGlobalQuoteCompany,
+  isGlobalQuoteFetchSuccessfully,
+  isGlobalQuoteFetchFailed,
+  globalQuote,
+  isOverviewDataFetchedSuccessfully,
 }) => {
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+  let [volumeCounter, setVolumeCounter] = useState(1);
+  const [volumeError, setVolumeError] = useState(false);
+  const [apiError, setApiError] = useState(false);
+  const [openPositions, setOpenPositions] = useState([]);
 
   useEffect(() => {
-    getOverview(companySymbol);
+    // getOverview(companySymbol);
+    // getTimeSeriesDailyAdjusted(companySymbol);
+    getGlobalQuoteCompany(companySymbol);
   }, []);
+
+  useEffect(() => {
+    if (globalQuote["Note"] || overviewData["Note"]) {
+      setApiError(true);
+    } else {
+      setApiError(false);
+    }
+  }, [globalQuote]);
 
   const toggleShowDescription = () => {
     setIsDescriptionVisible(!isDescriptionVisible);
   };
 
-  return (
-    <Grid container>
-      <Grid
-        item
-        xs={12}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          transform: "translateX(48px)",
-        }}
-      >
-        <h2 style={{ marginTop: "0" }}>{title}</h2>
-        <Button
-          onClick={toggleShowDescription}
+  const increaseVolume = () => {
+    setVolumeCounter(++volumeCounter);
+  };
+
+  const decreaseVolume = () => {
+    if (volumeCounter > 1) {
+      setVolumeCounter(--volumeCounter);
+    }
+  };
+
+  const calculateSellPrice = (price) => {
+    if (price) {
+      const priceNumber = parseFloat(price);
+      const result = (priceNumber - 0.1).toFixed(4);
+      return result;
+    }
+  };
+
+  const handleOpenPosition = (price) => {
+    const parsedPrice = parseFloat(price);
+    setOpenPositions([
+      ...openPositions,
+      {
+        symbol: companySymbol,
+        price: parsedPrice,
+        volume: volumeCounter,
+        totalPosition: parsedPrice * volumeCounter,
+      },
+    ]);
+  };
+
+  const handleClosePosition = (e) => {};
+
+  try {
+    return (
+      <Grid container>
+        <Grid
+          container
+          item
+          xs={12}
+          justify="center"
           style={{ marginBottom: "20px" }}
         >
-          <InfoOutlined style={{ color: "#2196f3" }} />
-        </Button>
+          <h2 style={{ fontWeight: "500", margin: "0" }}>{title}</h2>
+          <Button onClick={toggleShowDescription}>
+            <InfoOutlined style={{ color: "#2196f3" }} />
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <TextareaAutosize
+            rowsMax={5}
+            value={
+              isOverviewDataFetchedSuccessfully
+                ? overviewData["Description"]
+                : "This API is limited. Try again soon"
+            }
+            style={{
+              width: "300px",
+              maxWidth: "350px",
+              maxHeight: "100px",
+              transition: "0.3s",
+              height: isDescriptionVisible ? "80px" : "0",
+              opacity: isDescriptionVisible ? "1" : "0",
+            }}
+          />
+        </Grid>
+        {apiError ? (
+          <Grid container justify="center">
+            <div style={{ margin: "20px 0" }}>
+              This API is limited. Try again soon
+            </div>
+          </Grid>
+        ) : (
+          ""
+        )}
+        <Grid
+          container
+          justify="center"
+          alignItems="center"
+          style={{ marginTop: "20px" }}
+        >
+          <Grid container item xs={4} justify="center" alignItems="center">
+            <Button
+              style={{
+                ...buttonStyle,
+                backgroundColor:
+                  !isGlobalQuoteFetchSuccessfully || volumeError || apiError
+                    ? "#777"
+                    : "#F00",
+              }}
+              disabled={
+                !isGlobalQuoteFetchSuccessfully || volumeError || apiError
+              }
+            >
+              <Grid
+                container
+                direction="row"
+                justify="center"
+                alignItems="center"
+              >
+                <Grid item xs={12}>
+                  sell
+                </Grid>
+                <Grid item xs={12} style={minorTextStyle}>
+                  {!isGlobalQuoteFetchSuccessfully
+                    ? "Loading..."
+                    : globalQuote["Note"]
+                    ? "---"
+                    : calculateSellPrice(
+                        globalQuote["Global Quote"]["05. price"]
+                      )}
+                </Grid>
+              </Grid>
+            </Button>
+          </Grid>
+          <Grid item xs={3}>
+            <VolumeComponent
+              volumeCounter={volumeCounter}
+              increaseVolume={increaseVolume}
+              decreaseVolume={decreaseVolume}
+              setVolumeCounter={setVolumeCounter}
+              volumeError={volumeError}
+              setVolumeError={setVolumeError}
+            />
+          </Grid>
+          <Grid container item xs={4} justify="center" alignItems="center">
+            <Button
+              style={{
+                ...buttonStyle,
+                backgroundColor:
+                  !isGlobalQuoteFetchSuccessfully || volumeError || apiError
+                    ? "#777"
+                    : "#32c972",
+              }}
+              disabled={
+                !isGlobalQuoteFetchSuccessfully || volumeError || apiError
+              }
+              onClick={() =>
+                handleOpenPosition(globalQuote["Global Quote"]["05. price"])
+              }
+            >
+              <Grid
+                container
+                direction="row"
+                justify="center"
+                alignItems="center"
+              >
+                <Grid item xs={12}>
+                  buy
+                </Grid>
+                <Grid item xs={12} style={minorTextStyle}>
+                  {!isGlobalQuoteFetchSuccessfully
+                    ? "Loading..."
+                    : globalQuote["Note"]
+                    ? "---"
+                    : globalQuote["Global Quote"]["05. price"]}
+                </Grid>
+              </Grid>
+            </Button>
+          </Grid>
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <TextareaAutosize
-          rowsMax={5}
-          value={
-            overviewData["Description"]
-              ? overviewData["Description"]
-              : "This API is limited. Try again soon"
-          }
-          style={{
-            width: "300px",
-            maxWidth: "350px",
-            maxHeight: "100px",
-            transition: "0.3s",
-            height: isDescriptionVisible ? "80px" : "0",
-            opacity: isDescriptionVisible ? "1" : "0",
-            marginBottom: "20px",
-          }}
-        />
-      </Grid>
-      <Grid container justify="space-around">
-        <Button style={{ ...buttonStyle, backgroundColor: "#F00" }}>
-          <div>sell</div>
-          <div style={minorTextStyle}></div>
-        </Button>
-        <Button style={{ ...buttonStyle, backgroundColor: "#32c972" }}>
-          <div>buy</div>
-          <div style={minorTextStyle}></div>
-        </Button>
-      </Grid>
-    </Grid>
-  );
+    );
+  } catch (error) {
+    return <ErrorComponent message="Transaction card was crashed. Try again" />;
+  }
 };
 
 const mapStateToProps = (state) => {
   return {
-    isIntradayDataFetchedSuccessfully: state.isIntradayDataFetchedSuccessfully,
-    isIntradayDataFetchedFailed: state.isIntradayDataFetchedFailed,
-    intradayData: state.intradayData,
+    isTimeSeriesDailyAdjustedFetchedSuccessfully:
+      state.isTimeSeriesDailyAdjustedFetchedSuccessfully,
+    isTimeSeriesDailyAdjustedFetchedFailed:
+      state.isTimeSeriesDailyAdjustedFetchedFailed,
+    timesSeriesDailyAdjusted: state.timesSeriesDailyAdjusted,
     overviewData: state.overviewData,
-    isSearchDataLoading: state.isSearchDataLoading,
+    globalQuote: state.globalQuote,
+    isGlobalQuoteFetchSuccessfully: state.isGlobalQuoteFetchSuccessfully,
+    isGlobalQuoteFetchFailed: state.isGlobalQuoteFetchFailed,
+    isOverviewDataFetchedSuccessfully: state.isOverviewDataFetchedSuccessfully,
   };
 };
 
 const actions = {
-  getIntradayData,
+  getTimeSeriesDailyAdjusted,
   getOverview,
+  getGlobalQuoteCompany,
 };
 
 export default connect(mapStateToProps, actions)(TransactionCard);

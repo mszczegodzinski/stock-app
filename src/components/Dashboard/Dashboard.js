@@ -22,7 +22,6 @@ const Dashboard = () => {
 
   const showTransactionWindow = (company) => {
     const companySymbol = company["1. symbol"];
-    console.log("company param ", company);
     setTransactionWindow(
       <SweetAlert
         title=""
@@ -61,7 +60,6 @@ const Dashboard = () => {
       </div>
     );
   } catch (error) {
-    console.log(error);
     return <ErrorComponent message="Dashboard was crashed. Try refresh page" />;
   }
 };

@@ -11,6 +11,17 @@
   display: none;
 }
 
+.sweet-alert > h2 {
+  display: none;
+}
+.sweet-alert .MuiButton-root {
+  min-width: 0;
+}
+
+.volume-input {
+  text-align: center;
+}
+
 @keyframes show-animation {
   0% {
     opacity: 0;

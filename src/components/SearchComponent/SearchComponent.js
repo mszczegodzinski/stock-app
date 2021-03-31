@@ -68,7 +68,6 @@ const SearchComponent = ({
   }, [market]);
 
   const handleSearchComponentChange = (e) => {
-    console.log(e.target.value);
     const isValueIncorrect = utils.validateInput(e.target.value);
     setStockInputError(isValueIncorrect);
     setSearchedPhrase(e.target.value);
@@ -190,7 +189,6 @@ const SearchComponent = ({
       </>
     );
   } catch (error) {
-    console.log("error");
     return (
       <ErrorComponent message="Search input was crashed. Try refresh page" />
     );

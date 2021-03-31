@@ -34,9 +34,12 @@ const StockList = ({
 
   const renderStockList = () => {
     if (filteredData.length) {
-      const result = filteredData.map((el) => {
+      const result = filteredData.map((el, i) => {
         return (
-          <div style={{ width: "100%", marginBottom: "20px" }}>
+          <div
+            key={`stock-list-element-${i}`}
+            style={{ width: "100%", marginBottom: "20px" }}
+          >
             <Button
               style={{
                 padding: "0",
@@ -93,7 +96,6 @@ const StockList = ({
       </div>
     );
   } catch (error) {
-    console.log(error);
     return (
       <ErrorComponent message="Result stock list was crashed. Try refresh page" />
     );
