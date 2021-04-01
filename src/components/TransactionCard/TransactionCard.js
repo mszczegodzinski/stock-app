@@ -12,7 +12,6 @@ import { withStyles } from "@material-ui/core/styles";
 
 const CustomButton = withStyles({
   root: {
-    backgroundColor: "red",
     minWidth: "120px",
     color: "#FFF",
     fontWeight: "700",
@@ -21,9 +20,6 @@ const CustomButton = withStyles({
     display: "flex",
     flexDirection: "row",
     transition: "0.3s",
-    "&:hover": {
-      backgroundColor: "#FF0",
-    },
     "@media(max-width: 500px)": {
       padding: "12px 0",
     },
@@ -122,21 +118,6 @@ const TransactionCard = ({
   };
 
   const handleClosePosition = (price) => {
-    // const filteredPositions = openPositions.filter(({ symbol }) => symbol === companySymbol);
-
-    // if (!filteredPositions.length) {
-    //   return setSellError("No stock of this company");
-    // }
-
-    // let totalVolume = 0;
-    // filteredPositions.forEach((el) => {
-    //   totalVolume += el.volume;
-    // });
-
-    // if (totalVolume < volumeCounter) {
-    //   return setSellError("Not enough stocks of this company");
-    // }
-
     if (!totalStockVolume) {
       return setSellError("No stock of this company");
     }
