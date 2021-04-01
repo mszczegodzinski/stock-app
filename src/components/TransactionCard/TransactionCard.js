@@ -1,33 +1,45 @@
 import Button from "@material-ui/core/Button";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import {
-  getTimeSeriesDailyAdjusted,
-  getOverview,
-  getGlobalQuoteCompany,
-} from "../../actions/actions";
+import { getTimeSeriesDailyAdjusted, getOverview, getGlobalQuoteCompany } from "../../actions/actions";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import InfoOutlined from "@material-ui/icons/InfoOutlined";
 import Grid from "@material-ui/core/Grid";
 import VolumeComponent from "../VolumeComponent/VolumeComponent";
 import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import "../../utils/customStyles.css";
+import { withStyles } from "@material-ui/core/styles";
 
-const buttonStyle = {
-  minWidth: "120px",
-  color: "#FFF",
-  fontWeight: "700",
-  padding: "12px 10px",
-  fontSize: "20px",
-  display: "flex",
-  flexDirection: "row",
+const CustomButton = withStyles({
+  root: {
+    backgroundColor: "red",
+    minWidth: "120px",
+    color: "#FFF",
+    fontWeight: "700",
+    padding: "12px 10px",
+    fontSize: "20px",
+    display: "flex",
+    flexDirection: "row",
+    transition: "0.3s",
+    "&:hover": {
+      backgroundColor: "#FF0",
+    },
+    "@media(max-width: 500px)": {
+      padding: "12px 0",
+    },
+    "& div:nth-child(2)": {
+      fontSize: "16px",
+      fontWeight: "500",
+      textTransform: "none",
+    },
+  },
+})(Button);
+
+const textAreaAutosize = {
+  width: "300px",
+  maxWidth: "350px",
+  maxHeight: "100px",
   transition: "0.3s",
-};
-
-const minorTextStyle = {
-  fontSize: "16px",
-  fontWeight: "500",
-  textTransform: "none",
 };
 
 const TransactionCard = ({
@@ -50,9 +62,15 @@ const TransactionCard = ({
   const [volumeError, setVolumeError] = useState(false);
   const [apiError, setApiError] = useState(false);
   const [openPositions, setOpenPositions] = useState([]);
+  const [sellError, setSellError] = useState("");
+  const [transactionMessage, setTransactionMessage] = useState("");
+  const [totalStockVolume, setTotalStockVolume] = useState(0);
+  const [showPositionInfo, setShowPositionInfo] = useState(false);
+  const [positionsInfo, setPositionsInfo] = useState("");
+  const disabledButton = !isGlobalQuoteFetchSuccessfully || volumeError || apiError;
 
   useEffect(() => {
-    // getOverview(companySymbol);
+    getOverview(companySymbol);
     // getTimeSeriesDailyAdjusted(companySymbol);
     getGlobalQuoteCompany(companySymbol);
   }, []);
@@ -64,6 +82,10 @@ const TransactionCard = ({
       setApiError(false);
     }
   }, [globalQuote]);
+
+  useEffect(() => {
+    setShowPositionInfo(true);
+  }, [totalStockVolume]);
 
   const toggleShowDescription = () => {
     setIsDescriptionVisible(!isDescriptionVisible);
@@ -91,144 +113,175 @@ const TransactionCard = ({
     const parsedPrice = parseFloat(price);
     setOpenPositions([
       ...openPositions,
-      {
-        symbol: companySymbol,
-        price: parsedPrice,
-        volume: volumeCounter,
-        totalPosition: parsedPrice * volumeCounter,
-      },
+      { symbol: companySymbol, price: parsedPrice, volume: volumeCounter, totalPosition: parsedPrice * volumeCounter },
     ]);
+    setTransactionMessage(`${volumeCounter} stocks of ${companySymbol} were bought`);
+    const currentVolume = totalStockVolume + volumeCounter;
+    setTotalStockVolume(currentVolume);
+    setPositionsInfo(`Your positions: ${companySymbol} volume: ${currentVolume}`);
   };
 
-  const handleClosePosition = (e) => {};
+  const handleClosePosition = (price) => {
+    // const filteredPositions = openPositions.filter(({ symbol }) => symbol === companySymbol);
+
+    // if (!filteredPositions.length) {
+    //   return setSellError("No stock of this company");
+    // }
+
+    // let totalVolume = 0;
+    // filteredPositions.forEach((el) => {
+    //   totalVolume += el.volume;
+    // });
+
+    // if (totalVolume < volumeCounter) {
+    //   return setSellError("Not enough stocks of this company");
+    // }
+
+    if (!totalStockVolume) {
+      return setSellError("No stock of this company");
+    }
+
+    if (totalStockVolume < volumeCounter) {
+      return setSellError("Not enough stocks of this company");
+    }
+
+    const currentVolume = totalStockVolume - volumeCounter;
+    setTotalStockVolume(currentVolume);
+    setTransactionMessage(`${volumeCounter} stocks of ${companySymbol} were sold`);
+    setPositionsInfo(`Your positions: ${companySymbol} volume: ${currentVolume}`);
+    return setSellError("");
+  };
+
+  const renderCardHeader = () => {
+    return (
+      <Grid container item xs={12} justify="center" style={{ marginBottom: "20px" }}>
+        <h2 style={{ fontWeight: "500", margin: "0" }}>{title}</h2>
+        <Button onClick={toggleShowDescription}>
+          <InfoOutlined style={{ color: "#2196f3" }} />
+        </Button>
+      </Grid>
+    );
+  };
+
+  const renderTextArea = () => {
+    return (
+      <Grid item xs={12}>
+        <TextareaAutosize
+          rowsMax={5}
+          value={
+            isOverviewDataFetchedSuccessfully ? overviewData["Description"] : "This API is limited. Try again soon"
+          }
+          style={{
+            ...textAreaAutosize,
+            height: isDescriptionVisible ? "80px" : "0",
+            opacity: isDescriptionVisible ? "1" : "0",
+          }}
+        />
+      </Grid>
+    );
+  };
+
+  const renderApiWarning = () => {
+    return apiError ? (
+      <Grid container justify="center">
+        <div style={{ margin: "20px 0" }}>This API is limited. Try again soon</div>
+      </Grid>
+    ) : (
+      ""
+    );
+  };
+
+  const renderSellButton = () => {
+    return (
+      <Grid container item xs={4} justify="center" alignItems="center">
+        <CustomButton
+          disabled={disabledButton}
+          style={{ backgroundColor: disabledButton ? "#777" : "#F00" }}
+          onClick={() => handleClosePosition(globalQuote["Global Quote"]["05. price"])}
+        >
+          <Grid container direction="row" justify="center" alignItems="center">
+            <Grid item xs={12}>
+              sell
+            </Grid>
+            <Grid item xs={12}>
+              {!isGlobalQuoteFetchSuccessfully
+                ? "Loading..."
+                : globalQuote["Note"]
+                ? "---"
+                : calculateSellPrice(globalQuote["Global Quote"]["05. price"])}
+            </Grid>
+          </Grid>
+        </CustomButton>
+      </Grid>
+    );
+  };
+
+  const renderVolumeComponent = () => {
+    return (
+      <Grid container item xs={3}>
+        <VolumeComponent
+          volumeCounter={volumeCounter}
+          increaseVolume={increaseVolume}
+          decreaseVolume={decreaseVolume}
+          setVolumeCounter={setVolumeCounter}
+          volumeError={volumeError}
+          setVolumeError={setVolumeError}
+        />
+      </Grid>
+    );
+  };
+
+  const renderBuyButton = () => {
+    return (
+      <Grid container item xs={4} justify="center" alignItems="center">
+        <CustomButton
+          style={{ backgroundColor: disabledButton ? "#777" : "#32c972" }}
+          disabled={disabledButton}
+          onClick={() => handleOpenPosition(globalQuote["Global Quote"]["05. price"])}
+        >
+          <Grid container direction="row" justify="center" alignItems="center">
+            <Grid item xs={12}>
+              buy
+            </Grid>
+            <Grid item xs={12}>
+              {!isGlobalQuoteFetchSuccessfully
+                ? "Loading..."
+                : globalQuote["Note"]
+                ? "---"
+                : globalQuote["Global Quote"]["05. price"]}
+            </Grid>
+          </Grid>
+        </CustomButton>
+      </Grid>
+    );
+  };
+
+  const renderTransactionMessage = () => {
+    return (
+      <>
+        <Grid container justify="center">
+          <div style={{ margin: "20px 0" }}>{sellError.length ? sellError : transactionMessage}</div>
+        </Grid>
+        {showPositionInfo ? (
+          <Grid container justify="center">
+            <div style={{ margin: "20px 0" }}>{positionsInfo}</div>
+          </Grid>
+        ) : null}
+      </>
+    );
+  };
 
   try {
     return (
       <Grid container>
-        <Grid
-          container
-          item
-          xs={12}
-          justify="center"
-          style={{ marginBottom: "20px" }}
-        >
-          <h2 style={{ fontWeight: "500", margin: "0" }}>{title}</h2>
-          <Button onClick={toggleShowDescription}>
-            <InfoOutlined style={{ color: "#2196f3" }} />
-          </Button>
-        </Grid>
-        <Grid item xs={12}>
-          <TextareaAutosize
-            rowsMax={5}
-            value={
-              isOverviewDataFetchedSuccessfully
-                ? overviewData["Description"]
-                : "This API is limited. Try again soon"
-            }
-            style={{
-              width: "300px",
-              maxWidth: "350px",
-              maxHeight: "100px",
-              transition: "0.3s",
-              height: isDescriptionVisible ? "80px" : "0",
-              opacity: isDescriptionVisible ? "1" : "0",
-            }}
-          />
-        </Grid>
-        {apiError ? (
-          <Grid container justify="center">
-            <div style={{ margin: "20px 0" }}>
-              This API is limited. Try again soon
-            </div>
-          </Grid>
-        ) : (
-          ""
-        )}
-        <Grid
-          container
-          justify="center"
-          alignItems="center"
-          style={{ marginTop: "20px" }}
-        >
-          <Grid container item xs={4} justify="center" alignItems="center">
-            <Button
-              style={{
-                ...buttonStyle,
-                backgroundColor:
-                  !isGlobalQuoteFetchSuccessfully || volumeError || apiError
-                    ? "#777"
-                    : "#F00",
-              }}
-              disabled={
-                !isGlobalQuoteFetchSuccessfully || volumeError || apiError
-              }
-            >
-              <Grid
-                container
-                direction="row"
-                justify="center"
-                alignItems="center"
-              >
-                <Grid item xs={12}>
-                  sell
-                </Grid>
-                <Grid item xs={12} style={minorTextStyle}>
-                  {!isGlobalQuoteFetchSuccessfully
-                    ? "Loading..."
-                    : globalQuote["Note"]
-                    ? "---"
-                    : calculateSellPrice(
-                        globalQuote["Global Quote"]["05. price"]
-                      )}
-                </Grid>
-              </Grid>
-            </Button>
-          </Grid>
-          <Grid item xs={3}>
-            <VolumeComponent
-              volumeCounter={volumeCounter}
-              increaseVolume={increaseVolume}
-              decreaseVolume={decreaseVolume}
-              setVolumeCounter={setVolumeCounter}
-              volumeError={volumeError}
-              setVolumeError={setVolumeError}
-            />
-          </Grid>
-          <Grid container item xs={4} justify="center" alignItems="center">
-            <Button
-              style={{
-                ...buttonStyle,
-                backgroundColor:
-                  !isGlobalQuoteFetchSuccessfully || volumeError || apiError
-                    ? "#777"
-                    : "#32c972",
-              }}
-              disabled={
-                !isGlobalQuoteFetchSuccessfully || volumeError || apiError
-              }
-              onClick={() =>
-                handleOpenPosition(globalQuote["Global Quote"]["05. price"])
-              }
-            >
-              <Grid
-                container
-                direction="row"
-                justify="center"
-                alignItems="center"
-              >
-                <Grid item xs={12}>
-                  buy
-                </Grid>
-                <Grid item xs={12} style={minorTextStyle}>
-                  {!isGlobalQuoteFetchSuccessfully
-                    ? "Loading..."
-                    : globalQuote["Note"]
-                    ? "---"
-                    : globalQuote["Global Quote"]["05. price"]}
-                </Grid>
-              </Grid>
-            </Button>
-          </Grid>
+        {renderCardHeader()}
+        {renderTextArea()}
+        {renderApiWarning()}
+        {renderTransactionMessage()}
+        <Grid container justify="space-between" alignItems="center" style={{ marginTop: "20px" }}>
+          {renderSellButton()}
+          {renderVolumeComponent()}
+          {renderBuyButton()}
         </Grid>
       </Grid>
     );
@@ -239,10 +292,8 @@ const TransactionCard = ({
 
 const mapStateToProps = (state) => {
   return {
-    isTimeSeriesDailyAdjustedFetchedSuccessfully:
-      state.isTimeSeriesDailyAdjustedFetchedSuccessfully,
-    isTimeSeriesDailyAdjustedFetchedFailed:
-      state.isTimeSeriesDailyAdjustedFetchedFailed,
+    isTimeSeriesDailyAdjustedFetchedSuccessfully: state.isTimeSeriesDailyAdjustedFetchedSuccessfully,
+    isTimeSeriesDailyAdjustedFetchedFailed: state.isTimeSeriesDailyAdjustedFetchedFailed,
     timesSeriesDailyAdjusted: state.timesSeriesDailyAdjusted,
     overviewData: state.overviewData,
     globalQuote: state.globalQuote,
