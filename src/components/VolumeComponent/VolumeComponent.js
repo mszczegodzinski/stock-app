@@ -13,29 +13,45 @@ const cellStyleInside = {
   borderTop: "1px solid black",
 };
 
+const counterBtnStyle = {
+  minWidth: "0",
+  width: "100%",
+};
+
 const minorTextStyle = {
   fontSize: "12px",
 };
 
-const VolumeComponent = ({
-  volumeCounter,
-  decreaseVolume,
-  increaseVolume,
-  setVolumeCounter,
-  volumeError,
-  setVolumeError,
-}) => {
+const VolumeComponent = ({ volumeCounter, setVolumeCounter, volumeError, setVolumeError }) => {
+  const increaseVolume = () => {
+    if (volumeCounter) {
+      setVolumeCounter(++volumeCounter);
+      return setVolumeError(false);
+    }
+    setVolumeError(false);
+    return setVolumeCounter(1);
+  };
+
+  const decreaseVolume = () => {
+    if (volumeCounter > 1) {
+      setVolumeCounter(--volumeCounter);
+      return setVolumeError(false);
+    }
+    setVolumeError(false);
+    return setVolumeCounter(1);
+  };
+
   const setVolume = (e) => {
     const currentValue = e.target.value;
     const result = utils.validateVolume(currentValue);
 
     if (!currentValue) {
       setVolumeCounter(currentValue);
-      setVolumeError(true);
+      return setVolumeError(true);
     }
     if (!result && currentValue !== "0" && currentValue) {
       setVolumeCounter(currentValue);
-      setVolumeError(false);
+      return setVolumeError(false);
     }
   };
 
@@ -63,10 +79,14 @@ const VolumeComponent = ({
         </Grid>
         <Grid container direction="row">
           <Grid item xs={6} style={cellStyleInside}>
-            <Button onClick={decreaseVolume}>-</Button>
+            <Button onClick={() => decreaseVolume(volumeCounter)} style={counterBtnStyle}>
+              -
+            </Button>
           </Grid>
           <Grid item xs={6} style={cellStyleInside}>
-            <Button onClick={increaseVolume}>+</Button>
+            <Button onClick={() => increaseVolume(volumeCounter)} style={counterBtnStyle}>
+              +
+            </Button>
           </Grid>
         </Grid>
       </Grid>

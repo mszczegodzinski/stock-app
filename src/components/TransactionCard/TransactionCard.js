@@ -1,7 +1,11 @@
 import Button from "@material-ui/core/Button";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { getTimeSeriesDailyAdjusted, getOverview, getGlobalQuoteCompany } from "../../actions/actions";
+import {
+  getTimeSeriesDailyAdjusted,
+  getOverview,
+  getGlobalQuoteCompany,
+} from "../../actions/actions";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import InfoOutlined from "@material-ui/icons/InfoOutlined";
 import Grid from "@material-ui/core/Grid";
@@ -12,21 +16,28 @@ import { withStyles } from "@material-ui/core/styles";
 
 const CustomButton = withStyles({
   root: {
-    minWidth: "120px",
-    color: "#FFF",
+    minWidth: "110px",
+    color: "#FFF !important",
     fontWeight: "700",
-    padding: "12px 10px",
-    fontSize: "20px",
+    padding: "20px 10px",
+    fontSize: "16px",
     display: "flex",
+    width: "100%",
     flexDirection: "row",
     transition: "0.3s",
-    "@media(max-width: 500px)": {
-      padding: "12px 0",
-    },
     "& div:nth-child(2)": {
-      fontSize: "16px",
+      fontSize: "12px",
       fontWeight: "500",
       textTransform: "none",
+      transition: "0.3s",
+    },
+    "@media(min-width: 400px)": {
+      minWidth: "140px",
+      padding: "12px 10px",
+      fontSize: "20px",
+      "& div:nth-child(2)": {
+        fontSize: "16px",
+      },
     },
   },
 })(Button);
@@ -58,7 +69,7 @@ const TransactionCard = ({
   const [volumeError, setVolumeError] = useState(false);
   const [apiError, setApiError] = useState(false);
   const [openPositions, setOpenPositions] = useState([]);
-  const [sellError, setSellError] = useState("");
+  const [sellErrorMessage, setSellErrorMessage] = useState("");
   const [transactionMessage, setTransactionMessage] = useState("");
   const [totalStockVolume, setTotalStockVolume] = useState(0);
   const [showPositionInfo, setShowPositionInfo] = useState(false);
@@ -73,10 +84,9 @@ const TransactionCard = ({
 
   useEffect(() => {
     if (globalQuote["Note"] || overviewData["Note"]) {
-      setApiError(true);
-    } else {
-      setApiError(false);
+      return setApiError(true);
     }
+    return setApiError(false);
   }, [globalQuote]);
 
   useEffect(() => {
@@ -85,16 +95,6 @@ const TransactionCard = ({
 
   const toggleShowDescription = () => {
     setIsDescriptionVisible(!isDescriptionVisible);
-  };
-
-  const increaseVolume = () => {
-    setVolumeCounter(++volumeCounter);
-  };
-
-  const decreaseVolume = () => {
-    if (volumeCounter > 1) {
-      setVolumeCounter(--volumeCounter);
-    }
   };
 
   const calculateSellPrice = (price) => {
@@ -109,7 +109,12 @@ const TransactionCard = ({
     const parsedPrice = parseFloat(price);
     setOpenPositions([
       ...openPositions,
-      { symbol: companySymbol, price: parsedPrice, volume: volumeCounter, totalPosition: parsedPrice * volumeCounter },
+      {
+        symbol: companySymbol,
+        price: parsedPrice,
+        volume: volumeCounter,
+        totalPosition: parsedPrice * volumeCounter,
+      },
     ]);
     setTransactionMessage(`${volumeCounter} stocks of ${companySymbol} were bought`);
     const currentVolume = totalStockVolume + volumeCounter;
@@ -119,24 +124,26 @@ const TransactionCard = ({
 
   const handleClosePosition = (price) => {
     if (!totalStockVolume) {
-      return setSellError("No stock of this company");
+      return setSellErrorMessage("No stock of this company");
     }
 
     if (totalStockVolume < volumeCounter) {
-      return setSellError("Not enough stocks of this company");
+      return setSellErrorMessage("Not enough stocks of this company");
     }
 
     const currentVolume = totalStockVolume - volumeCounter;
     setTotalStockVolume(currentVolume);
     setTransactionMessage(`${volumeCounter} stocks of ${companySymbol} were sold`);
     setPositionsInfo(`Your positions: ${companySymbol} volume: ${currentVolume}`);
-    return setSellError("");
+    return setSellErrorMessage("");
   };
 
   const renderCardHeader = () => {
     return (
       <Grid container item xs={12} justify="center" style={{ marginBottom: "20px" }}>
-        <h2 style={{ fontWeight: "500", margin: "0" }}>{title}</h2>
+        <h2 className="transaction-card-header" style={{ fontWeight: "500", margin: "0" }}>
+          {title}
+        </h2>
         <Button onClick={toggleShowDescription}>
           <InfoOutlined style={{ color: "#2196f3" }} />
         </Button>
@@ -146,11 +153,13 @@ const TransactionCard = ({
 
   const renderTextArea = () => {
     return (
-      <Grid item xs={12}>
+      <Grid container item xs={12}>
         <TextareaAutosize
           rowsMax={5}
           value={
-            isOverviewDataFetchedSuccessfully ? overviewData["Description"] : "This API is limited. Try again soon"
+            isOverviewDataFetchedSuccessfully
+              ? overviewData["Description"]
+              : "This API is limited. Try again soon"
           }
           style={{
             ...textAreaAutosize,
@@ -167,9 +176,7 @@ const TransactionCard = ({
       <Grid container justify="center">
         <div style={{ margin: "20px 0" }}>This API is limited. Try again soon</div>
       </Grid>
-    ) : (
-      ""
-    );
+    ) : null;
   };
 
   const renderSellButton = () => {
@@ -202,8 +209,6 @@ const TransactionCard = ({
       <Grid container item xs={3}>
         <VolumeComponent
           volumeCounter={volumeCounter}
-          increaseVolume={increaseVolume}
-          decreaseVolume={decreaseVolume}
           setVolumeCounter={setVolumeCounter}
           volumeError={volumeError}
           setVolumeError={setVolumeError}
@@ -241,7 +246,9 @@ const TransactionCard = ({
     return (
       <>
         <Grid container justify="center">
-          <div style={{ margin: "20px 0" }}>{sellError.length ? sellError : transactionMessage}</div>
+          <div style={{ margin: "20px 0" }}>
+            {sellErrorMessage.length ? sellErrorMessage : transactionMessage}
+          </div>
         </Grid>
         {showPositionInfo ? (
           <Grid container justify="center">
@@ -273,7 +280,8 @@ const TransactionCard = ({
 
 const mapStateToProps = (state) => {
   return {
-    isTimeSeriesDailyAdjustedFetchedSuccessfully: state.isTimeSeriesDailyAdjustedFetchedSuccessfully,
+    isTimeSeriesDailyAdjustedFetchedSuccessfully:
+      state.isTimeSeriesDailyAdjustedFetchedSuccessfully,
     isTimeSeriesDailyAdjustedFetchedFailed: state.isTimeSeriesDailyAdjustedFetchedFailed,
     timesSeriesDailyAdjusted: state.timesSeriesDailyAdjusted,
     overviewData: state.overviewData,

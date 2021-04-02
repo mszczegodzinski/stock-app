@@ -18,6 +18,13 @@
   min-width: 0;
 }
 
+.transaction-card-header {
+  font-weight: 500;
+  margin: 0;
+  font-size: 22px;
+  transition: 0.3s;
+}
+
 .volume-input {
   text-align: center;
 }
@@ -31,5 +38,11 @@
   100% {
     opacity: 1;
     transform: translateY(0px);
+  }
+}
+
+@media (min-width: 400px) {
+  .transaction-card-header {
+    font-size: 27px;
   }
 }

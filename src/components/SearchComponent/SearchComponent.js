@@ -29,7 +29,7 @@ const SearchComponent = ({
 }) => {
   const [searchedPhrase, setSearchedPhrase] = useState("");
   const [stockInputError, setStockInputError] = useState(false);
-  const [market, setMarket] = useState("");
+  const [market, setMarket] = useState(null);
   const [marketOptions, setMarketOptions] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -57,14 +57,11 @@ const SearchComponent = ({
   }, [searchedData]);
 
   useEffect(() => {
-    const filterResult = searchedData.filter(
-      (el) => el["4. region"] === market
-    );
+    const filterResult = searchedData.filter((el) => el["4. region"] === market);
     if (filterResult.length) {
-      setFilteredData(filterResult);
-    } else {
-      setFilteredData(searchedData);
+      return setFilteredData(filterResult);
     }
+    return setFilteredData(searchedData);
   }, [market]);
 
   const handleSearchComponentChange = (e) => {
@@ -80,10 +77,9 @@ const SearchComponent = ({
 
   const handleSetMarket = (value) => {
     if (value) {
-      setMarket(value);
-    } else {
-      setMarket("");
+      return setMarket(value);
     }
+    return setMarket(null);
   };
 
   try {
@@ -91,10 +87,7 @@ const SearchComponent = ({
       <>
         <Grid container>
           <Grid item xs={12}>
-            <h2
-              className="search-module-header"
-              style={{ textAlign: "center" }}
-            >
+            <h2 className="search-module-header" style={{ textAlign: "center" }}>
               Search company
             </h2>
           </Grid>
@@ -102,9 +95,13 @@ const SearchComponent = ({
             <TextField
               id="company-input"
               label="Company name or symbol"
-              required
               variant="outlined"
               value={searchedPhrase}
+              disabled={
+                isSearchedDataFetchedSuccessfully ||
+                isSearchedDataFetchedFailed ||
+                isSearchDataLoading
+              }
               helperText={
                 stockInputError
                   ? !searchedPhrase
@@ -145,7 +142,7 @@ const SearchComponent = ({
               onChange={(event, newValue) => {
                 handleSetMarket(newValue);
               }}
-              style={{ minWidth: "250px" }}
+              style={{ width: "300px" }}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -168,9 +165,7 @@ const SearchComponent = ({
           </Grid>
         </Grid>
         <Snackbar
-          open={
-            isSearchedDataFetchedSuccessfully || isSearchedDataFetchedFailed
-          }
+          open={isSearchedDataFetchedSuccessfully || isSearchedDataFetchedFailed}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
           onClose={() => closeSearchDataNotification(searchedData)}
         >
@@ -181,17 +176,13 @@ const SearchComponent = ({
             elevation={6}
             onClose={() => closeSearchDataNotification(searchedData)}
           >
-            {searchedData.length
-              ? "Data was fetch successfully"
-              : "No result found"}
+            {searchedData.length ? "Data was fetch successfully" : "No result found"}
           </Alert>
         </Snackbar>
       </>
     );
   } catch (error) {
-    return (
-      <ErrorComponent message="Search input was crashed. Try refresh page" />
-    );
+    return <ErrorComponent message="Search input was crashed. Try refresh page" />;
   }
 };
 

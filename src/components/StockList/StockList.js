@@ -22,44 +22,50 @@ const StockList = ({
   const [isNoResult, setIsNoResult] = useState(false);
 
   useEffect(() => {
-    if (searchedData) {
-      if (!searchedData.length && isSearchedDataFetchedSuccessfully) {
-        setIsNoResult(true);
-      }
-      if (searchedData.length && isSearchedDataFetchedSuccessfully) {
-        setIsNoResult(false);
-      }
+    if (!searchedData.length && isSearchedDataFetchedSuccessfully) {
+      return setIsNoResult(true);
+    }
+    if (searchedData.length && isSearchedDataFetchedSuccessfully) {
+      return setIsNoResult(false);
     }
   }, [searchedData, isSearchedDataFetchedSuccessfully]);
+
+  const renderNoResultMessage = () => {
+    if (isNoResult) {
+      return (
+        <Grid container item xs={12} justify="center">
+          <div>No result found. Try again</div>
+        </Grid>
+      );
+    }
+  };
+
+  const renderDefaultMessage = () => {
+    if (!isNoResult && !filteredData.length) {
+      return (
+        <Grid container item xs={12} justify="center">
+          <div>No stocks were searched yet</div>
+        </Grid>
+      );
+    }
+  };
 
   const renderStockList = () => {
     if (filteredData.length) {
       const result = filteredData.map((el, i) => {
         return (
-          <div
-            key={`stock-list-element-${i}`}
-            style={{ width: "100%", marginBottom: "20px" }}
-          >
+          <div key={`stock-list-element-${i}`} style={{ minWidth: "100%", marginBottom: "20px" }}>
             <Button
-              style={{
-                padding: "0",
-                minWidth: "100%",
-              }}
+              style={{ padding: "0", minWidth: "100%" }}
               onClick={() => showTransactionWindow(el)}
             >
               <Card style={cardStyle}>
-                <Grid item xs={12}>
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <div style={{ marginRight: "25px" }}>{el["1. symbol"]}</div>
-                    <div style={{ textTransform: "none" }}>{el["2. name"]}</div>
-                  </div>
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    {el["4. region"]}
-                  </div>
+                <Grid item container xs={12} justify="space-between">
+                  <div style={{ marginRight: "25px" }}>{el["1. symbol"]}</div>
+                  <div style={{ textTransform: "none" }}>{el["2. name"]}</div>
+                  <Grid item container xs={12} justify="flex-start">
+                    <div>{el["4. region"]}</div>
+                  </Grid>
                 </Grid>
               </Card>
             </Button>
@@ -68,37 +74,25 @@ const StockList = ({
       });
       return result;
     }
-    if (isNoResult) {
-      return (
-        <Grid item xs={12}>
-          <p>No result found. Try again</p>
-        </Grid>
-      );
-    }
-    return (
-      <Grid item xs={12}>
-        <p>No stocks were searched yet</p>
-      </Grid>
-    );
   };
 
   try {
-    const res = renderStockList();
-
     return (
-      <div
-        className={
-          isNoResult || searchedData.length ? "stock-list-wrapper" : ""
-        }
+      <Grid
+        container
+        item
+        xs={12}
+        justify="center"
+        className={isNoResult || searchedData.length ? "stock-list-wrapper" : null}
         style={{ marginTop: "25px" }}
       >
-        {res}
-      </div>
+        {renderStockList()}
+        {renderNoResultMessage()}
+        {renderDefaultMessage()}
+      </Grid>
     );
   } catch (error) {
-    return (
-      <ErrorComponent message="Result stock list was crashed. Try refresh page" />
-    );
+    return <ErrorComponent message="Result stock list was crashed. Try refresh page" />;
   }
 };
 
