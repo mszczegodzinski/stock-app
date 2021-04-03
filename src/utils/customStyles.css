@@ -3,7 +3,8 @@
 }
 
 .app-header,
-.stock-list-wrapper {
+.stock-list-wrapper,
+.show-position {
   animation: show-animation 0.3s linear 0s forwards;
 }
 

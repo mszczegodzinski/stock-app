@@ -62,7 +62,7 @@ const StockList = ({
               <Card style={cardStyle}>
                 <Grid item container xs={12} justify="space-between">
                   <div style={{ marginRight: "25px" }}>{el["1. symbol"]}</div>
-                  <div style={{ textTransform: "none" }}>{el["2. name"]}</div>
+                  <div style={{ textTransform: "none", textAlign: "left" }}>{el["2. name"]}</div>
                   <Grid item container xs={12} justify="flex-start">
                     <div>{el["4. region"]}</div>
                   </Grid>

@@ -4,16 +4,13 @@ const fetchUrl = "https://www.alphavantage.co/query?function=";
 const key = process.env.REACT_APP_KEY;
 
 export const getTimeSeriesDailyAdjusted = (symbol) => (dispatch) => {
-  fetch(
-    `${fetchUrl}TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${key}`,
-    {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    }
-  )
+  fetch(`${fetchUrl}TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&apikey=${key}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
     .then((resp) => {
       return resp.json();
     })
@@ -103,6 +100,7 @@ export const setSearchDataLoading = (currentValue) => (dispatch) => {
 };
 
 export const getOverview = (symbol) => (dispatch) => {
+  dispatch({ type: types.IS_OVERVIEW_DATA_LOADING, payload: true });
   fetch(`${fetchUrl}OVERVIEW&symbol=${symbol}&apikey=${key}`, {
     method: "GET",
     headers: {
@@ -114,10 +112,16 @@ export const getOverview = (symbol) => (dispatch) => {
       return resp.json();
     })
     .then((data) => {
-      // console.log("overview data ", data);
+      console.log("overview data ", data);
+      dispatch({ type: types.IS_OVERVIEW_DATA_LOADING, payload: false });
       dispatch({ type: types.FETCH_OVERVIEW_DATA_SUCCESSFULLY, payload: data });
     })
     .catch((err) => {
+      dispatch({ type: types.IS_OVERVIEW_DATA_LOADING, payload: false });
       dispatch({ type: types.FETCH_OVERVIEW_DATA_FAILED, payload: {} });
     });
+};
+
+export const setOverviewDataLoading = (currentValue) => (dispatch) => {
+  dispatch({ type: types.IS_OVERVIEW_DATA_LOADING, payload: currentValue });
 };

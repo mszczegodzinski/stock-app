@@ -7,7 +7,7 @@ import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import TransactionCard from "../TransactionCard/TransactionCard";
 
 const wrapperStyle = {
-  padding: "20px 30px",
+  padding: "20px",
   backgroundColor: "#BBB",
   position: "relative",
 };
@@ -49,10 +49,7 @@ const Dashboard = () => {
             </Grid>
           </Grid>
         </Card>
-        <Card
-          className="search-module-card"
-          style={{ padding: "0 20px 40px 20px", opacity: "0" }}
-        >
+        <Card className="search-module-card" style={{ padding: "0 20px 40px 20px", opacity: "0" }}>
           <Grid container>
             <SearchComponent showTransactionWindow={showTransactionWindow} />
           </Grid>

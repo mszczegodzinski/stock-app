@@ -12,6 +12,7 @@ const initialState = {
   isDailyAdjustedDataLoading: false,
   isOverviewDataFetchedSuccessfully: false,
   isOverviewDataFetchedFailed: false,
+  isOverviewDataLoading: false,
   overviewData: {},
   isGlobalQuoteFetchSuccessfully: false,
   isGlobalQuoteFetchFailed: false,
@@ -32,7 +33,7 @@ const dashboardReducer = (state = initialState, action) => {
         ...state,
         isOverviewDataFetchedSuccessfully: false,
         isOverviewDataFetchedFailed: true,
-        overviewData: {},
+        overviewData: action.payload,
       };
     case types.FETCH_TIME_SERIES_DAILY_ADJUSTED_SUCCESSFULLY:
       return {
@@ -52,8 +53,7 @@ const dashboardReducer = (state = initialState, action) => {
       return {
         ...state,
         searchedData: action.payload,
-        isSearchedDataFetchedSuccessfully:
-          action.isSearchedDataFetchedSuccessfully,
+        isSearchedDataFetchedSuccessfully: action.isSearchedDataFetchedSuccessfully,
         isSearchedDataFetchedFailed: action.isSearchedDataFetchedFailed,
       };
     case types.IS_SEARCH_DATA_LOADING:
@@ -82,6 +82,12 @@ const dashboardReducer = (state = initialState, action) => {
         isGlobalQuoteFetchFailed: false,
         globalQuote: {},
       };
+    case types.IS_OVERVIEW_DATA_LOADING: {
+      return {
+        ...state,
+        isOverviewDataLoading: action.payload,
+      };
+    }
     default:
       return state;
   }
