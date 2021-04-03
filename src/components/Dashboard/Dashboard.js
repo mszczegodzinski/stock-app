@@ -1,20 +1,34 @@
 import React, { useState } from "react";
 import Card from "@material-ui/core/Card";
-import SearchComponent from "../SearchComponent/SearchComponent";
-import Grid from "@material-ui/core/Grid";
-import SweetAlert from "react-bootstrap-sweetalert";
 import ErrorComponent from "../ErrorComponent/ErrorComponent";
+import Grid from "@material-ui/core/Grid";
+import SearchComponent from "../SearchComponent/SearchComponent";
+import SweetAlert from "react-bootstrap-sweetalert";
 import TransactionCard from "../TransactionCard/TransactionCard";
 
 const wrapperStyle = {
+  minHeight: "95vh",
   padding: "20px",
   backgroundColor: "#BBB",
-  position: "relative",
+  boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
 };
 
 const cardStyle = {
   marginBottom: "25px",
   opacity: "0",
+  maxWidth: "500px",
+  width: "100%",
+};
+
+const searchModuleStyle = {
+  padding: "0 20px 40px 20px",
+  opacity: "0",
+  maxWidth: "500px",
+  boxSizing: "border-box",
+  width: "100%",
 };
 
 const Dashboard = () => {
@@ -49,7 +63,7 @@ const Dashboard = () => {
             </Grid>
           </Grid>
         </Card>
-        <Card className="search-module-card" style={{ padding: "0 20px 40px 20px", opacity: "0" }}>
+        <Card className="search-module-card" style={searchModuleStyle}>
           <Grid container>
             <SearchComponent showTransactionWindow={showTransactionWindow} />
           </Grid>

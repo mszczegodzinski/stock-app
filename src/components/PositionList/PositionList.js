@@ -20,9 +20,9 @@ const PositionList = ({ openPositions, showPositionInfo, setOpenPositions }) => 
 
   useEffect(() => {
     const pagesQuantity =
-      openPositions.length % maxPositionsOnPage === 0
-        ? Math.floor(openPositions.length / maxPositionsOnPage)
-        : Math.floor(openPositions.length / maxPositionsOnPage) + 1;
+      openPositions.length % maxPositionsOnPage
+        ? Math.floor(openPositions.length / maxPositionsOnPage) + 1
+        : Math.floor(openPositions.length / maxPositionsOnPage);
 
     if (pagesQuantity !== pages) {
       setPages(pagesQuantity);
