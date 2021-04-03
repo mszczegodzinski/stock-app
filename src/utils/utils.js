@@ -20,9 +20,21 @@ const validateVolume = (value) => {
   return false;
 };
 
+const getGridCenteredProps = (width) => {
+  const gridCenteredProps = {
+    container: true,
+    item: true,
+    xs: width,
+    justify: "center",
+    alignItems: "center",
+  };
+  return gridCenteredProps;
+};
+
 const utils = {
   validateInput,
   validateVolume,
+  getGridCenteredProps,
 };
 
 export default utils;

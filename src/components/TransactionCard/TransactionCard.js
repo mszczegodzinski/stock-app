@@ -15,9 +15,8 @@ import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import "../../utils/customStyles.css";
 import { withStyles } from "@material-ui/core/styles";
 import { CircularProgress } from "@material-ui/core";
-import Checkbox from "@material-ui/core/Checkbox";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import PositionList from "../PositionList/PositionList";
+import utils from "../../utils/utils";
 
 const CustomButton = withStyles({
   root: {
@@ -47,11 +46,29 @@ const CustomButton = withStyles({
   },
 })(Button);
 
-const textAreaAutosizeStyle = {
-  width: "300px",
-  maxWidth: "350px",
-  maxHeight: "100px",
-  transition: "0.3s",
+const getTextAreaAutosizeStyle = (condition) => {
+  const textAreaAutosizeStyle = {
+    width: "300px",
+    minWidth: "250px",
+    minHeight: "80px",
+    maxWidth: "300px",
+    maxHeight: "80px",
+    transition: "0.3s",
+    height: condition ? "80px" : "0",
+    opacity: condition ? "1" : "0",
+  };
+  return textAreaAutosizeStyle;
+};
+
+const getSellErrorMessageStyle = (condition) => {
+  const sellErrorMessageStyle = {
+    height: condition ? "24px" : "0",
+    marginTop: condition ? "15px" : "0",
+    transition: "0.3s",
+    fontWeight: "600",
+    color: "#F00",
+  };
+  return sellErrorMessageStyle;
 };
 
 const TransactionCard = ({
@@ -99,6 +116,17 @@ const TransactionCard = ({
     return setShowPositionInfo(false);
   }, [openPositions]);
 
+  useEffect(() => {
+    if (sellErrorMessage) {
+      const sellErrorMessageTimeout = setTimeout(() => {
+        setSellErrorMessage("");
+      }, 5000);
+      return () => {
+        clearTimeout(sellErrorMessageTimeout);
+      };
+    }
+  }, [sellErrorMessage]);
+
   const toggleShowDescription = () => {
     if (companySymbol !== overviewData["Symbol"]) {
       getOverview(companySymbol);
@@ -130,6 +158,10 @@ const TransactionCard = ({
   const handleClosePosition = (price) => {
     const checkedPositionIndex = openPositions.findIndex(({ isChecked }) => isChecked === true);
     const checkedPosition = openPositions[checkedPositionIndex];
+    if (!openPositions.length) {
+      return setSellErrorMessage("No stocks to sell");
+    }
+
     if (checkedPositionIndex === -1) {
       return setSellErrorMessage("No position checked");
     }
@@ -137,8 +169,9 @@ const TransactionCard = ({
     if (checkedPosition["volume"] < volumeCounter) {
       return setSellErrorMessage("Not enough stocks to sell");
     }
-
+    // reset error message:
     setSellErrorMessage("");
+    // subtract volume from picked position:
     const mappedResult = openPositions.map((el) => {
       if (el.isChecked) {
         checkedPosition["volume"] -= volumeCounter;
@@ -146,30 +179,17 @@ const TransactionCard = ({
       }
       return el;
     });
-
+    // delete positions which current volume is zero:
     if (!checkedPosition["volume"]) {
-      // filter position if it's quantity is 0
       const filteredPositions = openPositions.filter(({ volume }) => volume !== 0);
       return setOpenPositions([...filteredPositions]);
     }
     return setOpenPositions([...mappedResult]);
   };
 
-  const handleCheckPosition = (e) => {
-    const currentClickedIndex = parseInt(e.target.name);
-    // disable checkboxes in all positions:
-    const result = openPositions.map((el) => {
-      el.isChecked = false;
-      return el;
-    });
-    // enable checkbox in specific position:
-    result[currentClickedIndex]["isChecked"] = true;
-    setOpenPositions([...result]);
-  };
-
   const renderCardHeader = () => {
     return (
-      <Grid container item xs={12} justify="center" style={{ marginBottom: "20px" }}>
+      <Grid {...utils.getGridCenteredProps(12)} style={{ marginBottom: "20px" }}>
         <h2 className="transaction-card-header" style={{ fontWeight: "500", margin: "0" }}>
           {title}
         </h2>
@@ -183,10 +203,7 @@ const TransactionCard = ({
   const renderTextArea = () => {
     return (
       <Grid
-        container
-        item
-        xs={12}
-        justify="center"
+        {...utils.getGridCenteredProps(12)}
         style={{
           height: isDescriptionVisible ? "80px" : "0",
           transition: "0.3s",
@@ -202,11 +219,7 @@ const TransactionCard = ({
                 ? overviewData["Description"]
                 : "This API is limited. Try again in one minute."
             }
-            style={{
-              ...textAreaAutosizeStyle,
-              height: isDescriptionVisible ? "80px" : "0",
-              opacity: isDescriptionVisible ? "1" : "0",
-            }}
+            style={getTextAreaAutosizeStyle(isDescriptionVisible)}
           />
         )}
       </Grid>
@@ -227,7 +240,7 @@ const TransactionCard = ({
 
   const renderSellButton = () => {
     return (
-      <Grid container item xs={4} justify="center" alignItems="center">
+      <Grid {...utils.getGridCenteredProps(4)}>
         <CustomButton
           disabled={disabledButton}
           style={{ backgroundColor: disabledButton ? "#777" : "#F00" }}
@@ -252,7 +265,7 @@ const TransactionCard = ({
 
   const renderVolumeComponent = () => {
     return (
-      <Grid container item xs={3}>
+      <Grid {...utils.getGridCenteredProps(3)}>
         <VolumeComponent
           volumeCounter={volumeCounter}
           setVolumeCounter={setVolumeCounter}
@@ -265,7 +278,7 @@ const TransactionCard = ({
 
   const renderBuyButton = () => {
     return (
-      <Grid container item xs={4} justify="center" alignItems="center">
+      <Grid {...utils.getGridCenteredProps(4)}>
         <CustomButton
           style={{ backgroundColor: disabledButton ? "#777" : "#32c972" }}
           disabled={disabledButton}
@@ -291,84 +304,10 @@ const TransactionCard = ({
   const renderSellErrorMessage = () => {
     return (
       <Grid
-        container
-        justify="center"
-        style={{
-          height: sellErrorMessage.length ? "24px" : "0",
-          marginTop: "10px",
-          transition: "0.3s",
-          fontWeight: "600",
-          color: "#F00",
-        }}
+        {...utils.getGridCenteredProps(12)}
+        style={getSellErrorMessageStyle(sellErrorMessage.length)}
       >
-        <div style={{ margin: "5px 0" }}>{sellErrorMessage}</div>
-      </Grid>
-    );
-  };
-
-  const renderCurrentPositions = () => {
-    return (
-      <Grid
-        container
-        justify="flex-start"
-        style={{
-          transition: "0.3s",
-          minHeight: showPositionInfo ? "100px" : "0",
-          opacity: showPositionInfo ? "1" : "0",
-        }}
-      >
-        <Grid
-          container
-          justify="flex-start"
-          style={{
-            height: showPositionInfo ? "39px" : "0",
-            fontWeight: "700",
-            margin: "15px 0 0 0",
-            transition: "0.3s",
-          }}
-        >
-          Open Positions:
-        </Grid>
-        <Grid container direction="row">
-          {openPositions.map((el, i) => {
-            return (
-              <Grid
-                container
-                item
-                xs={12}
-                justify="center"
-                alignItems="center"
-                style={{
-                  fontSize: "14px",
-                  textAlign: "left",
-                  fontWeight: "500",
-                }}
-                className="show-position"
-                key={`position-element-${i}`}
-              >
-                <Grid item xs={2}>
-                  <Checkbox
-                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                    checkedIcon={<CheckBoxIcon fontSize="small" />}
-                    color="default"
-                    onChange={(e) => handleCheckPosition(e)}
-                    checked={openPositions[i]["isChecked"]}
-                    name={`${i}`}
-                  />
-                </Grid>
-                <Grid item xs={5}>
-                  {el.symbol}
-                </Grid>
-                <Grid item xs={2}>
-                  {el.volume}
-                </Grid>
-                <Grid item xs={3}>
-                  {el.price}
-                </Grid>
-              </Grid>
-            );
-          })}
-        </Grid>
+        {sellErrorMessage}
       </Grid>
     );
   };
@@ -385,7 +324,11 @@ const TransactionCard = ({
           {renderBuyButton()}
         </Grid>
         {renderSellErrorMessage()}
-        {renderCurrentPositions()}
+        <PositionList
+          openPositions={openPositions}
+          showPositionInfo={showPositionInfo}
+          setOpenPositions={setOpenPositions}
+        />
       </Grid>
     );
   } catch (error) {
