@@ -10,8 +10,19 @@ const validateInput = (value) => {
   return false;
 };
 
+const validateVolume = (value) => {
+  const regex = /^[0-9]{0,3}$/;
+  const isIncorrectValue = regex.test(value);
+
+  if (!isIncorrectValue) {
+    return true;
+  }
+  return false;
+};
+
 const utils = {
   validateInput,
+  validateVolume,
 };
 
 export default utils;

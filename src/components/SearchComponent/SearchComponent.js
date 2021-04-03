@@ -29,7 +29,7 @@ const SearchComponent = ({
 }) => {
   const [searchedPhrase, setSearchedPhrase] = useState("");
   const [stockInputError, setStockInputError] = useState(false);
-  const [market, setMarket] = useState("");
+  const [market, setMarket] = useState(null);
   const [marketOptions, setMarketOptions] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -39,36 +39,33 @@ const SearchComponent = ({
 
   useEffect(() => {
     if (isSearchedDataFetchedSuccessfully) {
-      setSearchDataLoading(false);
-      setTimeout(() => {
+      const searchNotificationTimeout = setTimeout(() => {
         closeSearchDataNotification(searchedData);
       }, 5000);
-      // delete this timeout in return
+      return () => {
+        clearTimeout(searchNotificationTimeout);
+      };
     }
   }, [isSearchedDataFetchedSuccessfully]);
 
   useEffect(() => {
     // delete duplicate values:
     if (searchedData.length) {
-      const duplicate = searchedData.map((el) => el["4. region"]);
-      const unique = new Set(duplicate);
-      setMarketOptions([...unique]);
+      const duplicates = searchedData.map((el) => el["4. region"]);
+      const distinctValues = new Set(duplicates);
+      setMarketOptions([...distinctValues]);
     }
   }, [searchedData]);
 
   useEffect(() => {
-    const filterResult = searchedData.filter(
-      (el) => el["4. region"] === market
-    );
+    const filterResult = searchedData.filter((el) => el["4. region"] === market);
     if (filterResult.length) {
-      setFilteredData(filterResult);
-    } else {
-      setFilteredData(searchedData);
+      return setFilteredData(filterResult);
     }
+    return setFilteredData(searchedData);
   }, [market]);
 
   const handleSearchComponentChange = (e) => {
-    console.log(e.target.value);
     const isValueIncorrect = utils.validateInput(e.target.value);
     setStockInputError(isValueIncorrect);
     setSearchedPhrase(e.target.value);
@@ -81,10 +78,29 @@ const SearchComponent = ({
 
   const handleSetMarket = (value) => {
     if (value) {
-      setMarket(value);
-    } else {
-      setMarket("");
+      return setMarket(value);
     }
+    return setMarket(null);
+  };
+
+  const renderTransactionWindow = () => {
+    return (
+      <Snackbar
+        open={isSearchedDataFetchedSuccessfully || isSearchedDataFetchedFailed}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => closeSearchDataNotification(searchedData)}
+      >
+        <Alert
+          icon={false}
+          variant="filled"
+          color={searchedData.length ? "success" : "error"}
+          elevation={6}
+          onClose={() => closeSearchDataNotification(searchedData)}
+        >
+          {searchedData.length ? "Data was fetch successfully" : "No result found"}
+        </Alert>
+      </Snackbar>
+    );
   };
 
   try {
@@ -92,10 +108,7 @@ const SearchComponent = ({
       <>
         <Grid container>
           <Grid item xs={12}>
-            <h2
-              className="search-module-header"
-              style={{ textAlign: "center" }}
-            >
+            <h2 className="search-module-header" style={{ textAlign: "center" }}>
               Search company
             </h2>
           </Grid>
@@ -103,9 +116,13 @@ const SearchComponent = ({
             <TextField
               id="company-input"
               label="Company name or symbol"
-              required
               variant="outlined"
               value={searchedPhrase}
+              disabled={
+                isSearchedDataFetchedSuccessfully ||
+                isSearchedDataFetchedFailed ||
+                isSearchDataLoading
+              }
               helperText={
                 stockInputError
                   ? !searchedPhrase
@@ -127,11 +144,7 @@ const SearchComponent = ({
                 isSearchedDataFetchedSuccessfully ||
                 isSearchedDataFetchedFailed
               }
-              style={{
-                marginTop: "30px",
-                marginBottom: "30px",
-                transition: "0.3s",
-              }}
+              style={{ margin: "30px 0", transition: "0.3s" }}
               onClick={handleSearchClicked}
             >
               Search
@@ -143,10 +156,8 @@ const SearchComponent = ({
               value={market}
               options={marketOptions}
               getOptionLabel={(marketOption) => marketOption}
-              onChange={(event, newValue) => {
-                handleSetMarket(newValue);
-              }}
-              style={{ minWidth: "250px" }}
+              onChange={(event, newValue) => handleSetMarket(newValue)}
+              style={{ width: "300px" }}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -168,32 +179,11 @@ const SearchComponent = ({
             )}
           </Grid>
         </Grid>
-        <Snackbar
-          open={
-            isSearchedDataFetchedSuccessfully || isSearchedDataFetchedFailed
-          }
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-          onClose={() => closeSearchDataNotification(searchedData)}
-        >
-          <Alert
-            icon={false}
-            variant="filled"
-            color={searchedData.length ? "success" : "error"}
-            elevation={6}
-            onClose={() => closeSearchDataNotification(searchedData)}
-          >
-            {searchedData.length
-              ? "Data was fetch successfully"
-              : "No result found"}
-          </Alert>
-        </Snackbar>
+        {renderTransactionWindow()}
       </>
     );
   } catch (error) {
-    console.log("error");
-    return (
-      <ErrorComponent message="Search input was crashed. Try refresh page" />
-    );
+    return <ErrorComponent message="Search input was crashed. Try refresh page" />;
   }
 };
 

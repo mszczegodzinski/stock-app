@@ -1,9 +1,9 @@
 import types from "../types";
 
 const initialState = {
-  isIntradayDataFetchedSuccessfully: false,
-  isIntradayDataFetchedFailed: false,
-  intradayData: {},
+  isTimeSeriesDailyAdjustedFetchedSuccessfully: false,
+  isTimeSeriesDailyAdjustedFetchedFailed: false,
+  timesSeriesDailyAdjusted: {},
   isSearchedDataFetchedSuccessfully: false,
   isSearchedDataFetchedFailed: false,
   searchedData: [],
@@ -12,7 +12,11 @@ const initialState = {
   isDailyAdjustedDataLoading: false,
   isOverviewDataFetchedSuccessfully: false,
   isOverviewDataFetchedFailed: false,
+  isOverviewDataLoading: false,
   overviewData: {},
+  isGlobalQuoteFetchSuccessfully: false,
+  isGlobalQuoteFetchFailed: false,
+  globalQuote: {},
 };
 
 const dashboardReducer = (state = initialState, action) => {
@@ -29,28 +33,27 @@ const dashboardReducer = (state = initialState, action) => {
         ...state,
         isOverviewDataFetchedSuccessfully: false,
         isOverviewDataFetchedFailed: true,
-        overviewData: {},
+        overviewData: action.payload,
       };
-    case types.FETCH_INTRADAY_DATA_SUCCESSFULLY:
+    case types.FETCH_TIME_SERIES_DAILY_ADJUSTED_SUCCESSFULLY:
       return {
         ...state,
-        isIntradayDataFetchedSuccessfully: true,
-        isIntradayDataFetchedFailed: false,
-        intradayData: action.payload,
+        isTimeSeriesDailyAdjustedFetchedSuccessfully: true,
+        isTimeSeriesDailyAdjustedFetchedFailed: false,
+        timesSeriesDailyAdjusted: action.payload,
       };
-    case types.FETCH_INTRADAY_DATA_FAILED:
+    case types.FETCH_TIME_SERIES_DAILY_ADJUSTED_FAILED:
       return {
         ...state,
-        isIntradayDataFetchedSuccessfully: false,
-        isIntradayDataFetchedFailed: true,
-        intradayData: {},
+        isTimeSeriesDailyAdjustedFetchedSuccessfully: false,
+        isTimeSeriesDailyAdjustedFetchedFailed: true,
+        timesSeriesDailyAdjusted: {},
       };
     case types.FETCH_SEARCH_ENDPOINT_DATA:
       return {
         ...state,
         searchedData: action.payload,
-        isSearchedDataFetchedSuccessfully:
-          action.isSearchedDataFetchedSuccessfully,
+        isSearchedDataFetchedSuccessfully: action.isSearchedDataFetchedSuccessfully,
         isSearchedDataFetchedFailed: action.isSearchedDataFetchedFailed,
       };
     case types.IS_SEARCH_DATA_LOADING:
@@ -58,6 +61,33 @@ const dashboardReducer = (state = initialState, action) => {
         ...state,
         isSearchDataLoading: action.payload,
       };
+    case types.FETCH_GLOBAL_QUOTE_SUCCESSFULLY:
+      return {
+        ...state,
+        isGlobalQuoteFetchSuccessfully: true,
+        isGlobalQuoteFetchFailed: false,
+        globalQuote: action.payload,
+      };
+    case types.FETCH_GLOBAL_QUOTE_FAILED:
+      return {
+        ...state,
+        isGlobalQuoteFetchSuccessfully: false,
+        isGlobalQuoteFetchFailed: true,
+        globalQuote: {},
+      };
+    case types.RESET_GLOBAL_QUOTE:
+      return {
+        ...state,
+        isGlobalQuoteFetchSuccessfully: false,
+        isGlobalQuoteFetchFailed: false,
+        globalQuote: {},
+      };
+    case types.IS_OVERVIEW_DATA_LOADING: {
+      return {
+        ...state,
+        isOverviewDataLoading: action.payload,
+      };
+    }
     default:
       return state;
   }
