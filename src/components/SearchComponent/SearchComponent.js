@@ -32,6 +32,28 @@ const SearchComponent = ({
   const [market, setMarket] = useState(null);
   const [marketOptions, setMarketOptions] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const textFieldDisabledCondition =
+    isSearchedDataFetchedSuccessfully || isSearchedDataFetchedFailed || isSearchDataLoading;
+  const searchButtonDisabled =
+    isSearchedDataFetchedSuccessfully ||
+    isSearchedDataFetchedFailed ||
+    isSearchDataLoading ||
+    !searchedPhrase ||
+    stockInputError;
+
+  const onKeyDown = (e) => {
+    if (e.keyCode === 13 && !searchButtonDisabled) {
+      e.preventDefault();
+      getSearchComponentData(searchedPhrase);
+      setSearchedPhrase("");
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [searchedPhrase]);
 
   useEffect(() => {
     setFilteredData([...searchedData]);
@@ -118,11 +140,7 @@ const SearchComponent = ({
               label="Company name or symbol"
               variant="outlined"
               value={searchedPhrase}
-              disabled={
-                isSearchedDataFetchedSuccessfully ||
-                isSearchedDataFetchedFailed ||
-                isSearchDataLoading
-              }
+              disabled={textFieldDisabledCondition}
               helperText={
                 stockInputError
                   ? !searchedPhrase
@@ -138,12 +156,7 @@ const SearchComponent = ({
           <Grid container item xs={12} justify="center" alignItems="center">
             <Button
               variant="outlined"
-              disabled={
-                !searchedPhrase ||
-                stockInputError ||
-                isSearchedDataFetchedSuccessfully ||
-                isSearchedDataFetchedFailed
-              }
+              disabled={searchButtonDisabled}
               style={{ margin: "30px 0", transition: "0.3s" }}
               onClick={handleSearchClicked}
             >
