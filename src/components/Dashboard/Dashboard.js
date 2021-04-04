@@ -7,13 +7,13 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import TransactionCard from "../TransactionCard/TransactionCard";
 
 const wrapperStyle = {
-  minHeight: "95vh",
   padding: "20px",
   backgroundColor: "#BBB",
   boxSizing: "border-box",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  flexGrow: "1",
 };
 
 const cardStyle = {
