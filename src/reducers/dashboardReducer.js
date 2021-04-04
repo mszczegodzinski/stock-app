@@ -17,6 +17,7 @@ const initialState = {
   isGlobalQuoteFetchSuccessfully: false,
   isGlobalQuoteFetchFailed: false,
   globalQuote: {},
+  allOpenPositions: [],
 };
 
 const dashboardReducer = (state = initialState, action) => {
@@ -86,6 +87,18 @@ const dashboardReducer = (state = initialState, action) => {
       return {
         ...state,
         isOverviewDataLoading: action.payload,
+      };
+    }
+    case types.SAVE_OPEN_POSITIONS: {
+      return {
+        ...state,
+        allOpenPositions: [...action.payload],
+      };
+    }
+    case types.RESET_OPEN_POSITIONS: {
+      return {
+        ...state,
+        allOpenPositions: [],
       };
     }
     default:

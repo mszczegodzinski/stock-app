@@ -4,8 +4,8 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
 import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import Grid from "@material-ui/core/Grid";
-import Pagination from "@material-ui/lab/Pagination";
 import utils from "../../utils/utils";
+import { FixedSizeList } from "react-window";
 
 const positionElementStyle = {
   fontSize: "14px",
@@ -13,43 +13,25 @@ const positionElementStyle = {
   fontWeight: "500",
 };
 
-const PositionList = ({ openPositions, showPositionInfo, setOpenPositions }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pages, setPages] = useState(1);
+const PositionList = ({ showPositionInfo, allOpenPositions, saveOpenPositions }) => {
   const maxPositionsOnPage = 4;
-
-  useEffect(() => {
-    const pagesQuantity =
-      openPositions.length % maxPositionsOnPage
-        ? Math.floor(openPositions.length / maxPositionsOnPage) + 1
-        : Math.floor(openPositions.length / maxPositionsOnPage);
-
-    if (pagesQuantity !== pages) {
-      setPages(pagesQuantity);
-      setCurrentPage(pagesQuantity);
-    }
-  }, [openPositions]);
-
-  const handleChangePage = (event, value) => {
-    setCurrentPage(value);
-  };
 
   const handleCheckPosition = (e) => {
     const currentClickedIndex = parseInt(e.target.name);
-    const positionToCompareIndex = openPositions.findIndex((el) => el["isChecked"] === true);
+    const positionToCompareIndex = allOpenPositions.findIndex((el) => el["isChecked"] === true);
 
     // disable checkbox for all positions:
-    const result = openPositions.map((el) => {
+    const result = allOpenPositions.map((el) => {
       el.isChecked = false;
       return el;
     });
     // if was clicked the same checkbox again:
     if (currentClickedIndex === positionToCompareIndex) {
-      return setOpenPositions([...result]);
+      return saveOpenPositions([...result]);
     }
     // enable checkbox for specific position:
     result[currentClickedIndex]["isChecked"] = true;
-    setOpenPositions([...result]);
+    saveOpenPositions([...result]);
   };
 
   const renderPositionListHeader = () => {
@@ -69,52 +51,53 @@ const PositionList = ({ openPositions, showPositionInfo, setOpenPositions }) => 
     );
   };
 
-  const renderPositionList = () => {
-    const minRange = currentPage * maxPositionsOnPage - maxPositionsOnPage;
-    const maxRange = currentPage * maxPositionsOnPage;
-    return (
-      <Grid container direction="row">
-        {openPositions.map((el, i) => {
-          if (i > minRange - 1 && i < maxRange) {
-            return (
-              <Grid
-                {...utils.getGridCenteredProps(12)}
-                style={positionElementStyle}
-                className="show-position"
-                key={`position-element-${i}`}
-              >
-                <Grid item xs={2}>
-                  <Checkbox
-                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                    checkedIcon={<CheckBoxIcon fontSize="small" />}
-                    color="default"
-                    onChange={(e) => handleCheckPosition(e)}
-                    checked={openPositions[i]["isChecked"]}
-                    name={`${i}`}
-                  />
-                </Grid>
-                <Grid item xs={5}>
-                  {el.symbol}
-                </Grid>
-                <Grid item xs={2}>
-                  {el.volume}
-                </Grid>
-                <Grid item xs={3}>
-                  {el.price}
-                </Grid>
-              </Grid>
-            );
-          }
-        })}
-      </Grid>
-    );
+  const renderRows = () => {
+    const res = allOpenPositions.map((el, i) => {
+      return (
+        <Grid
+          {...utils.getGridCenteredProps(12)}
+          style={positionElementStyle}
+          key={`position-element-${i}`}
+        >
+          <Grid item xs={2}>
+            <Checkbox
+              icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+              checkedIcon={<CheckBoxIcon fontSize="small" />}
+              color="default"
+              onChange={(e) => handleCheckPosition(e)}
+              checked={allOpenPositions[i]["isChecked"]}
+              name={`${i}`}
+            />
+          </Grid>
+          <Grid item xs={5}>
+            {el.symbol}
+          </Grid>
+          <Grid item xs={2}>
+            {el.volume}
+          </Grid>
+          <Grid item xs={3}>
+            {el.price}
+          </Grid>
+        </Grid>
+      );
+    });
+    return res;
   };
 
-  const renderPagination = () => {
-    if (openPositions.length <= maxPositionsOnPage) {
-      return null;
-    }
-    return <Pagination count={pages} page={currentPage} onChange={handleChangePage} />;
+  const renderSwipeableList = () => {
+    const elHeight = 38;
+    const currentSize =
+      allOpenPositions.length < maxPositionsOnPage ? allOpenPositions.length * elHeight : 152;
+    return (
+      <FixedSizeList
+        height={showPositionInfo ? currentSize : 0}
+        itemSize={allOpenPositions.length}
+        itemCount={1}
+        style={{ width: "100%" }}
+      >
+        {renderRows}
+      </FixedSizeList>
+    );
   };
 
   try {
@@ -129,8 +112,7 @@ const PositionList = ({ openPositions, showPositionInfo, setOpenPositions }) => 
         }}
       >
         {renderPositionListHeader()}
-        {renderPositionList()}
-        {renderPagination()}
+        {renderSwipeableList()}
       </Grid>
     );
   } catch (error) {

@@ -6,6 +6,8 @@ import {
   getOverview,
   getGlobalQuoteCompany,
   setOverviewDataLoading,
+  saveOpenPositions,
+  resetOpenPositions,
 } from "../../actions/actions";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import InfoOutlined from "@material-ui/icons/InfoOutlined";
@@ -87,14 +89,15 @@ const TransactionCard = ({
   isOverviewDataFetchedSuccessfully,
   setOverviewDataLoading,
   isOverviewDataLoading,
+  saveOpenPositions,
+  allOpenPositions,
 }) => {
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   let [volumeCounter, setVolumeCounter] = useState(1);
   const [volumeError, setVolumeError] = useState(false);
   const [apiError, setApiError] = useState(false);
-  const [openPositions, setOpenPositions] = useState([]);
   const [sellErrorMessage, setSellErrorMessage] = useState("");
-  const [showPositionInfo, setShowPositionInfo] = useState(false);
+  const [showPositionInfo, setShowPositionInfo] = useState(allOpenPositions.length ? true : false);
   const disabledButton = !isGlobalQuoteFetchSuccessfully || volumeError || apiError;
 
   useEffect(() => {
@@ -110,11 +113,11 @@ const TransactionCard = ({
   }, [globalQuote]);
 
   useEffect(() => {
-    if (openPositions.length) {
+    if (allOpenPositions.length) {
       return setShowPositionInfo(true);
     }
     return setShowPositionInfo(false);
-  }, [openPositions]);
+  }, [allOpenPositions]);
 
   useEffect(() => {
     if (sellErrorMessage) {
@@ -144,8 +147,8 @@ const TransactionCard = ({
 
   const handleOpenPosition = (price) => {
     const parsedPrice = parseFloat(price);
-    setOpenPositions([
-      ...openPositions,
+    saveOpenPositions([
+      ...allOpenPositions,
       {
         symbol: companySymbol,
         price: parsedPrice,
@@ -156,9 +159,9 @@ const TransactionCard = ({
   };
 
   const handleClosePosition = (price) => {
-    const checkedPositionIndex = openPositions.findIndex(({ isChecked }) => isChecked === true);
-    const checkedPosition = openPositions[checkedPositionIndex];
-    if (!openPositions.length) {
+    const checkedPositionIndex = allOpenPositions.findIndex(({ isChecked }) => isChecked === true);
+    const checkedPosition = allOpenPositions[checkedPositionIndex];
+    if (!allOpenPositions.length) {
       return setSellErrorMessage("No stocks to sell");
     }
 
@@ -166,13 +169,18 @@ const TransactionCard = ({
       return setSellErrorMessage("No position checked");
     }
 
+    if (checkedPosition.symbol !== companySymbol) {
+      return setSellErrorMessage("Invalid position checked");
+    }
+
     if (checkedPosition["volume"] < volumeCounter) {
       return setSellErrorMessage("Not enough stocks to sell");
     }
+
     // reset error message:
     setSellErrorMessage("");
     // subtract volume from picked position:
-    const mappedResult = openPositions.map((el) => {
+    const mappedResult = allOpenPositions.map((el) => {
       if (el.isChecked) {
         checkedPosition["volume"] -= volumeCounter;
         return checkedPosition;
@@ -181,10 +189,10 @@ const TransactionCard = ({
     });
     // delete positions which current volume is zero:
     if (!checkedPosition["volume"]) {
-      const filteredPositions = openPositions.filter(({ volume }) => volume !== 0);
-      return setOpenPositions([...filteredPositions]);
+      const filteredPositions = allOpenPositions.filter(({ volume }) => volume !== 0);
+      return saveOpenPositions([...filteredPositions]);
     }
-    return setOpenPositions([...mappedResult]);
+    return saveOpenPositions([...mappedResult]);
   };
 
   const renderCardHeader = () => {
@@ -325,9 +333,9 @@ const TransactionCard = ({
         </Grid>
         {renderSellErrorMessage()}
         <PositionList
-          openPositions={openPositions}
           showPositionInfo={showPositionInfo}
-          setOpenPositions={setOpenPositions}
+          allOpenPositions={allOpenPositions}
+          saveOpenPositions={saveOpenPositions}
         />
       </Grid>
     );
@@ -348,6 +356,7 @@ const mapStateToProps = (state) => {
     isGlobalQuoteFetchFailed: state.isGlobalQuoteFetchFailed,
     isOverviewDataFetchedSuccessfully: state.isOverviewDataFetchedSuccessfully,
     isOverviewDataLoading: state.isOverviewDataLoading,
+    allOpenPositions: state.allOpenPositions,
   };
 };
 
@@ -356,6 +365,8 @@ const actions = {
   getOverview,
   getGlobalQuoteCompany,
   setOverviewDataLoading,
+  saveOpenPositions,
+  resetOpenPositions,
 };
 
 export default connect(mapStateToProps, actions)(TransactionCard);

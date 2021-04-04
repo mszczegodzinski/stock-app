@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "@material-ui/core/Card";
+import { connect } from "react-redux";
 import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import Grid from "@material-ui/core/Grid";
 import SearchComponent from "../SearchComponent/SearchComponent";
 import SweetAlert from "react-bootstrap-sweetalert";
 import TransactionCard from "../TransactionCard/TransactionCard";
+import { resetOpenPositions } from "../../actions/actions";
 
 const wrapperStyle = {
   padding: "20px",
@@ -31,8 +33,12 @@ const searchModuleStyle = {
   width: "100%",
 };
 
-const Dashboard = () => {
+const Dashboard = ({ resetOpenPositions }) => {
   const [transactionWindow, setTransactionWindow] = useState(null);
+
+  useEffect(() => {
+    resetOpenPositions();
+  }, []);
 
   const showTransactionWindow = (company) => {
     const companySymbol = company["1. symbol"];
@@ -75,4 +81,8 @@ const Dashboard = () => {
   }
 };
 
-export default Dashboard;
+const actions = {
+  resetOpenPositions,
+};
+
+export default connect(null, actions)(Dashboard);

@@ -125,3 +125,11 @@ export const getOverview = (symbol) => (dispatch) => {
 export const setOverviewDataLoading = (currentValue) => (dispatch) => {
   dispatch({ type: types.IS_OVERVIEW_DATA_LOADING, payload: currentValue });
 };
+
+export const saveOpenPositions = (openPositions) => (dispatch) => {
+  dispatch({ type: types.SAVE_OPEN_POSITIONS, payload: openPositions });
+};
+
+export const resetOpenPositions = () => (dispatch) => {
+  dispatch({ type: types.RESET_OPEN_POSITIONS, payload: [] });
+};
