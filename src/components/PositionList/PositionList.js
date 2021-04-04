@@ -13,12 +13,19 @@ const positionElementStyle = {
   fontWeight: "500",
 };
 
-const PositionList = ({ showPositionInfo, allOpenPositions, saveOpenPositions }) => {
+const PositionList = ({
+  showPositionInfo,
+  allOpenPositionsFiltered,
+  saveOpenPositions,
+  allOpenPositions,
+}) => {
   const maxPositionsOnPage = 4;
 
   const handleCheckPosition = (e) => {
     const currentClickedIndex = parseInt(e.target.name);
-    const positionToCompareIndex = allOpenPositions.findIndex((el) => el["isChecked"] === true);
+    const positionToCompareIndex = allOpenPositionsFiltered.findIndex(
+      (el) => el["isChecked"] === true
+    );
 
     // disable checkbox for all positions:
     const result = allOpenPositions.map((el) => {
@@ -52,7 +59,7 @@ const PositionList = ({ showPositionInfo, allOpenPositions, saveOpenPositions })
   };
 
   const renderRows = () => {
-    const res = allOpenPositions.map((el, i) => {
+    const res = allOpenPositionsFiltered.map((el, i) => {
       return (
         <Grid
           {...utils.getGridCenteredProps(12)}
@@ -65,7 +72,7 @@ const PositionList = ({ showPositionInfo, allOpenPositions, saveOpenPositions })
               checkedIcon={<CheckBoxIcon fontSize="small" />}
               color="default"
               onChange={(e) => handleCheckPosition(e)}
-              checked={allOpenPositions[i]["isChecked"]}
+              checked={allOpenPositionsFiltered[i]["isChecked"]}
               name={`${i}`}
             />
           </Grid>
@@ -87,11 +94,13 @@ const PositionList = ({ showPositionInfo, allOpenPositions, saveOpenPositions })
   const renderSwipeableList = () => {
     const elHeight = 38;
     const currentSize =
-      allOpenPositions.length < maxPositionsOnPage ? allOpenPositions.length * elHeight : 152;
+      allOpenPositionsFiltered.length < maxPositionsOnPage
+        ? allOpenPositionsFiltered.length * elHeight
+        : 152;
     return (
       <FixedSizeList
         height={showPositionInfo ? currentSize : 0}
-        itemSize={allOpenPositions.length}
+        itemSize={allOpenPositionsFiltered.length}
         itemCount={1}
         style={{ width: "100%" }}
       >

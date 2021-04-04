@@ -99,11 +99,17 @@ const TransactionCard = ({
   const [sellErrorMessage, setSellErrorMessage] = useState("");
   const [showPositionInfo, setShowPositionInfo] = useState(allOpenPositions.length ? true : false);
   const disabledButton = !isGlobalQuoteFetchSuccessfully || volumeError || apiError;
+  const [allOpenPositionsFiltered, setAllOpenPositionsFiltered] = useState([]);
 
   useEffect(() => {
     // getTimeSeriesDailyAdjusted(companySymbol);
     getGlobalQuoteCompany(companySymbol);
   }, []);
+
+  useEffect(() => {
+    const filteredPositions = allOpenPositions.filter(({ symbol }) => symbol === companySymbol);
+    setAllOpenPositionsFiltered(filteredPositions);
+  }, [allOpenPositions]);
 
   useEffect(() => {
     if (globalQuote["Note"] || overviewData["Note"]) {
@@ -113,11 +119,11 @@ const TransactionCard = ({
   }, [globalQuote]);
 
   useEffect(() => {
-    if (allOpenPositions.length) {
+    if (allOpenPositionsFiltered.length) {
       return setShowPositionInfo(true);
     }
     return setShowPositionInfo(false);
-  }, [allOpenPositions]);
+  }, [allOpenPositionsFiltered]);
 
   useEffect(() => {
     if (sellErrorMessage) {
@@ -159,9 +165,11 @@ const TransactionCard = ({
   };
 
   const handleClosePosition = (price) => {
-    const checkedPositionIndex = allOpenPositions.findIndex(({ isChecked }) => isChecked === true);
-    const checkedPosition = allOpenPositions[checkedPositionIndex];
-    if (!allOpenPositions.length) {
+    const checkedPositionIndex = allOpenPositionsFiltered.findIndex(
+      ({ isChecked }) => isChecked === true
+    );
+    const checkedPosition = allOpenPositionsFiltered[checkedPositionIndex];
+    if (!allOpenPositionsFiltered.length) {
       return setSellErrorMessage("No stocks to sell");
     }
 
@@ -180,7 +188,7 @@ const TransactionCard = ({
     // reset error message:
     setSellErrorMessage("");
     // subtract volume from picked position:
-    const mappedResult = allOpenPositions.map((el) => {
+    const mappedResult = allOpenPositionsFiltered.map((el) => {
       if (el.isChecked) {
         checkedPosition["volume"] -= volumeCounter;
         return checkedPosition;
@@ -334,8 +342,9 @@ const TransactionCard = ({
         {renderSellErrorMessage()}
         <PositionList
           showPositionInfo={showPositionInfo}
-          allOpenPositions={allOpenPositions}
+          allOpenPositionsFiltered={allOpenPositionsFiltered}
           saveOpenPositions={saveOpenPositions}
+          allOpenPositions={allOpenPositions}
         />
       </Grid>
     );
