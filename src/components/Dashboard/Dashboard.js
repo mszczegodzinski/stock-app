@@ -67,7 +67,7 @@ const Dashboard = ({ resetOpenPositions }) => {
       <div style={wrapperStyle}>
         {transactionWindow}
         <Grid container style={{ maxWidth: "500px" }}>
-          <Link to="/" style={{ textDecoration: "none" }}>
+          <Link to="/stock-app" style={{ textDecoration: "none" }}>
             <Button style={{ fontSize: "16px", fontWeight: "700" }}>
               <ArrowBack />
               Back

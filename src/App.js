@@ -9,7 +9,7 @@ const App = () => {
     <Router>
       <div>
         <Switch>
-          <Route path="/dashboard">
+          <Route path="/stock-app/dashboard">
             <div
               className="App"
               style={{ height: "100vh", display: "flex", flexDirection: "column" }}
@@ -18,7 +18,7 @@ const App = () => {
               <Footer />
             </div>
           </Route>
-          <Route path="/">
+          <Route path="/stock-app">
             <div
               className="App"
               style={{ height: "100vh", display: "flex", flexDirection: "column" }}
