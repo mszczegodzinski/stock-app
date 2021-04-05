@@ -1,6 +1,6 @@
 # Stock App
 
-Simple stock app using Alpha Vantage API (https://www.alphavantage.co/documentation/) to get and display data about listed companies.
+Simple stock app using Alpha Vantage API [](https://www.alphavantage.co/documentation/) to get and display data about listed companies.
 
 Full version app: (https:\\mszczegodzinski.github.io\stock-app)
 
