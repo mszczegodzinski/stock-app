@@ -104,7 +104,7 @@ const TransactionCard = ({
   useEffect(() => {
     // getTimeSeriesDailyAdjusted(companySymbol);
     getGlobalQuoteCompany(companySymbol);
-  }, []);
+  }, [companySymbol]);
 
   useEffect(() => {
     const filteredPositions = allOpenPositions.filter(({ symbol }) => symbol === companySymbol);
@@ -116,7 +116,7 @@ const TransactionCard = ({
       return setApiError(true);
     }
     return setApiError(false);
-  }, [globalQuote]);
+  }, [globalQuote, overviewData]);
 
   useEffect(() => {
     if (allOpenPositionsFiltered.length) {
