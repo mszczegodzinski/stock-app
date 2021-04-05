@@ -5,7 +5,7 @@ const footerStyle = {
   boxSizing: "border-box",
   padding: "10px 20px",
   textAlign: "right",
-  color: "#FFF",
+  color: "#eee",
   backgroundColor: "#4D4D4D",
   fontWeight: "500",
 };
