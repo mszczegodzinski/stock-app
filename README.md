@@ -1,8 +1,8 @@
 # Stock App
 
-Simple stock app using Alpha Vantage API [](https://www.alphavantage.co/documentation/) to get and display data about listed companies.
+Simple stock app using Alpha Vantage API (https://www.alphavantage.co/documentation/) to get and display data about listed companies.
 
-Full version app: (https:\\mszczegodzinski.github.io\stock-app)
+[Click here to run Stock App](https://mszczegodzinski.github.io/stock-app)
 
 ## User
 
@@ -16,7 +16,6 @@ User can:
 
 ## Future Plans:
 
-- homepage (add React Router)
 - swipeable drawer / menu
 - display all open positions in different subpage
 - display candle chart for picked stock in other subpage
