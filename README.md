@@ -1,24 +1,30 @@
-# stock-app
+# Stock App 
 
-Icon by Free Preloaders on freeicons.io - favicon
+Simple stock app using Alpha Vantage API (https://www.alphavantage.co/documentation/) to get and display data about listed companies.
 
+Full version app: https:\\mszczegodzinski.github.io\stock-app
+
+## User
+
+User can:
+- search for company either name or symbol, 
+- filter result by market,
+- read some information about specific company for instance: indicators, description,
+- see price of picked stock,
+- buy or sell stock,
+ 
+## Future Plans:
+- homepage (add React Router)
+- swipeable drawer / menu
+- display all open positions in different subpage
+- display candle chart for picked stock in other subpage
+- migration from JS to TS
+- login and registration module
+
+## Resources to be assigned:
+
+Favicon: Icon by Free Preloaders on freeicons.io
+Logo 192x192, 512x512: 
+```
 <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
-
-Requirements:
-
-## About your users
-
-- They'll probably want to buy or sell a stock after getting information from your website
-
-* They can probably only operate on specific stock exchanges (e.g. European investors have trouble accessing US-based exchanges)
-
-* They won't always know the symbol of the company, only the name (e.g. they might not know TSLA stands for Tesla)
-
-* They will be interested in some information about the company other than just its name and price
-
-## Requirements
-
-- **Display stocks**, e.g. in a list
-- Use the [**Alpha Vantage API**](https://www.alphavantage.co/documentation/) (you can get a rate-limited API key for free)
-- Spend about **6 hours** on this (you can spread it over as many days as you like)
-- **Use GitHub** and give us a link to the repository - we'll also assess your skill with `git`
+```
