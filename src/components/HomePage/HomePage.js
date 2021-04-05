@@ -35,7 +35,7 @@ const HomePage = () => {
         <Card className="welcome-card" style={cardStyle}>
           <h1 style={{ margin: "0" }}>Welcome in Stock App</h1>
           <Grid {...utils.getGridCenteredProps(12)} style={{ margin: "25px 0" }}>
-            <Typography>Stock App is a simple demo app which can use you to trade.</Typography>
+            <Typography>Stock App is a simple demo app which can be used to trade.</Typography>
             <Typography>Have a good time!</Typography>
           </Grid>
           <Grid {...utils.getGridCenteredProps(12)} style={{ margin: "25px 0 10px 0" }}>

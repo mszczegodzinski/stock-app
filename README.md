@@ -27,11 +27,19 @@ User can:
 
 ### Search company
 
+Type company name or symbol in 'Company name or symbol' input and click Search button or Enter
+
 ### Filter by market
+
+Search company first and then type country name or pick country name in dropdown
 
 ### Buy or sell
 
+Serach company first, click on the one of result, pick the volume and click BUY. If you want to sell some stock, you have to buy it first.
+
 ### Show overview
+
+Search company first, click on the one of result then click on the info icon (small blue button next to company name)
 
 ## Resources to be assigned:
 
