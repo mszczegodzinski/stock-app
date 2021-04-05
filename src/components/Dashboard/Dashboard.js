@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
+import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
 import { connect } from "react-redux";
 import ErrorComponent from "../ErrorComponent/ErrorComponent";
 import Grid from "@material-ui/core/Grid";
+import { Link } from "react-router-dom";
 import SearchComponent from "../SearchComponent/SearchComponent";
 import SweetAlert from "react-bootstrap-sweetalert";
 import TransactionCard from "../TransactionCard/TransactionCard";
 import { resetOpenPositions } from "../../actions/actions";
+import ArrowBack from "@material-ui/icons/ArrowBack";
+import utils from "../../utils/utils";
 
 const wrapperStyle = {
   padding: "20px",
@@ -62,10 +66,18 @@ const Dashboard = ({ resetOpenPositions }) => {
     return (
       <div style={wrapperStyle}>
         {transactionWindow}
+        <Grid container style={{ maxWidth: "500px" }}>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <Button style={{ fontSize: "16px", fontWeight: "700" }}>
+              <ArrowBack />
+              Back
+            </Button>
+          </Link>
+        </Grid>
         <Card className="app-header" style={cardStyle}>
           <Grid container>
-            <Grid item xs={12}>
-              <h1 style={{ textAlign: "center" }}>Stock app</h1>
+            <Grid {...utils.getGridCenteredProps(12)}>
+              <h1 style={{ textAlign: "center" }}>Stock App</h1>
             </Grid>
           </Grid>
         </Card>
