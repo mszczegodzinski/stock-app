@@ -23,24 +23,18 @@ const PositionList = ({
   const maxPositionsOnPage = 4;
 
   const handleCheckPosition = (e) => {
-    const currentClickedIndex = parseInt(e.target.name);
-    const positionToCompareIndex = allOpenPositions.findIndex(
-      (el) => el["isChecked"] === true && el["symbol"] === companySymbol
-    );
-    const positionToCompare = allOpenPositions.find(
-      (el) => el["isChecked"] === true && el["symbol"] === companySymbol
-    );
-    // disable checkbox for all positions:
+    const currentId = e.target.id;
+    const currentClickedPosition = allOpenPositions.find((el) => el["id"] === currentId);
+    const isCurrentChecked = currentClickedPosition["isChecked"];
+    // disable checkbox for all positions except current clicked position:
     const result = allOpenPositions.map((el) => {
-      el.isChecked = false;
+      if (el["id"] !== currentId) {
+        el.isChecked = false;
+      }
       return el;
     });
-    // if was clicked the same checkbox again:
-    if (currentClickedIndex === positionToCompareIndex) {
-      return saveOpenPositions([...result]);
-    }
-    // enable checkbox for specific position:
-    result[currentClickedIndex]["isChecked"] = true;
+
+    currentClickedPosition["isChecked"] = !isCurrentChecked;
     saveOpenPositions([...result]);
   };
 
@@ -62,7 +56,7 @@ const PositionList = ({
   };
 
   const renderRows = () => {
-    const res = allOpenPositions.map((el, i) => {
+    const res = allOpenPositionsFiltered.map((el, i) => {
       return (
         <Grid
           {...utils.getGridCenteredProps(12)}
@@ -71,11 +65,12 @@ const PositionList = ({
         >
           <Grid item xs={2}>
             <Checkbox
+              id={`${companySymbol}-${i}`}
               icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
               checkedIcon={<CheckBoxIcon fontSize="small" />}
               color="default"
               onChange={(e) => handleCheckPosition(e)}
-              checked={allOpenPositions[i]["isChecked"]}
+              checked={el["isChecked"]}
               name={`${i}`}
             />
           </Grid>
@@ -97,11 +92,13 @@ const PositionList = ({
   const renderSwipeableList = () => {
     const elHeight = 38;
     const currentSize =
-      allOpenPositions.length < maxPositionsOnPage ? allOpenPositions.length * elHeight : 152;
+      allOpenPositionsFiltered.length < maxPositionsOnPage
+        ? allOpenPositionsFiltered.length * elHeight
+        : 152;
     return (
       <FixedSizeList
         height={showPositionInfo ? currentSize : 0}
-        itemSize={allOpenPositions.length}
+        itemSize={allOpenPositionsFiltered.length}
         itemCount={1}
         style={{ width: "100%" }}
       >

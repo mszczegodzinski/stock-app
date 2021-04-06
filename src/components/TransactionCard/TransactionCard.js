@@ -124,11 +124,11 @@ const TransactionCard = ({
   }, [globalQuote, overviewData]);
 
   useEffect(() => {
-    if (allOpenPositions.length) {
+    if (allOpenPositionsFiltered.length) {
       return setShowPositionInfo(true);
     }
     return setShowPositionInfo(false);
-  }, [allOpenPositions]);
+  }, [allOpenPositionsFiltered]);
 
   useEffect(() => {
     if (sellErrorMessage) {
@@ -161,6 +161,7 @@ const TransactionCard = ({
     saveOpenPositions([
       ...allOpenPositions,
       {
+        id: `${companySymbol}-${allOpenPositionsFiltered.length}`,
         symbol: companySymbol,
         price: parsedPrice,
         volume: volumeCounter,

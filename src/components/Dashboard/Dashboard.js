@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import SearchComponent from "../SearchComponent/SearchComponent";
 import SweetAlert from "react-bootstrap-sweetalert";
 import TransactionCard from "../TransactionCard/TransactionCard";
-import { resetOpenPositions } from "../../actions/actions";
+import { resetOpenPositions, resetGlobalQuoteCompany } from "../../actions/actions";
 import ArrowBack from "@material-ui/icons/ArrowBack";
 import utils from "../../utils/utils";
 
@@ -37,7 +37,7 @@ const searchModuleStyle = {
   width: "100%",
 };
 
-const Dashboard = ({ resetOpenPositions }) => {
+const Dashboard = ({ resetOpenPositions, resetGlobalQuoteCompany }) => {
   const [transactionWindow, setTransactionWindow] = useState(null);
 
   useEffect(() => {
@@ -45,6 +45,7 @@ const Dashboard = ({ resetOpenPositions }) => {
   }, []);
 
   const showTransactionWindow = (company) => {
+    resetGlobalQuoteCompany();
     const companySymbol = company["1. symbol"];
     setTransactionWindow(
       <SweetAlert
@@ -95,6 +96,7 @@ const Dashboard = ({ resetOpenPositions }) => {
 
 const actions = {
   resetOpenPositions,
+  resetGlobalQuoteCompany,
 };
 
 export default connect(null, actions)(Dashboard);
