@@ -27,7 +27,7 @@ export const getTimeSeriesDailyAdjusted = (symbol) => (dispatch) => {
 };
 
 export const getGlobalQuoteCompany = (symbol) => (dispatch) => {
-  resetGlobalQuoteCompany();
+  dispatch({ type: types.RESET_GLOBAL_QUOTE });
   fetch(`${fetchUrl}GLOBAL_QUOTE&symbol=${symbol}&apikey=${key}`, {
     method: "GET",
     headers: {
