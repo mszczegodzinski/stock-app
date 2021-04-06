@@ -1,7 +1,7 @@
 import React from "react";
 import Dashboard from "./components/Dashboard/Dashboard";
 import Footer from "./components/Footer/Footer";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import HomePage from "./components/HomePage/HomePage";
 
 const App = () => {
@@ -9,7 +9,7 @@ const App = () => {
     <Router>
       <div>
         <Switch>
-          <Route path="/stock-app/dashboard">
+          <Route exact path="/stock-app/dashboard">
             <div
               className="App"
               style={{ height: "100vh", display: "flex", flexDirection: "column" }}
@@ -18,7 +18,7 @@ const App = () => {
               <Footer />
             </div>
           </Route>
-          <Route path="/stock-app">
+          <Route exact path="/stock-app">
             <div
               className="App"
               style={{ height: "100vh", display: "flex", flexDirection: "column" }}
@@ -26,6 +26,9 @@ const App = () => {
               <HomePage />
               <Footer />
             </div>
+          </Route>
+          <Route path="*">
+            <Redirect to="/stock-app" />
           </Route>
         </Switch>
       </div>
