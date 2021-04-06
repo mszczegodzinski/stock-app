@@ -104,6 +104,11 @@ const TransactionCard = ({
   useEffect(() => {
     // getTimeSeriesDailyAdjusted(companySymbol);
     getGlobalQuoteCompany(companySymbol);
+    const resetCheckedPositions = allOpenPositions.map((el) => {
+      el.isChecked = false;
+      return el;
+    });
+    saveOpenPositions(resetCheckedPositions);
   }, [companySymbol]);
 
   useEffect(() => {
@@ -119,11 +124,11 @@ const TransactionCard = ({
   }, [globalQuote, overviewData]);
 
   useEffect(() => {
-    if (allOpenPositionsFiltered.length) {
+    if (allOpenPositions.length) {
       return setShowPositionInfo(true);
     }
     return setShowPositionInfo(false);
-  }, [allOpenPositionsFiltered]);
+  }, [allOpenPositions]);
 
   useEffect(() => {
     if (sellErrorMessage) {
@@ -165,20 +170,18 @@ const TransactionCard = ({
   };
 
   const handleClosePosition = (price) => {
-    const checkedPositionIndex = allOpenPositionsFiltered.findIndex(
-      ({ isChecked }) => isChecked === true
-    );
-    const checkedPosition = allOpenPositionsFiltered[checkedPositionIndex];
+    const checkedPositionIndex = allOpenPositions.findIndex(({ isChecked }) => isChecked === true);
+    const checkedPosition = allOpenPositions[checkedPositionIndex];
     if (!allOpenPositionsFiltered.length) {
       return setSellErrorMessage("No stocks to sell");
     }
 
-    if (checkedPositionIndex === -1) {
-      return setSellErrorMessage("No position checked");
+    if (checkedPosition && checkedPosition.symbol !== companySymbol) {
+      return setSellErrorMessage("Invalid position checked");
     }
 
-    if (checkedPosition.symbol !== companySymbol) {
-      return setSellErrorMessage("Invalid position checked");
+    if (checkedPositionIndex === -1) {
+      return setSellErrorMessage("No position checked");
     }
 
     if (checkedPosition["volume"] < volumeCounter) {
@@ -345,6 +348,7 @@ const TransactionCard = ({
           allOpenPositionsFiltered={allOpenPositionsFiltered}
           saveOpenPositions={saveOpenPositions}
           allOpenPositions={allOpenPositions}
+          companySymbol={companySymbol}
         />
       </Grid>
     );

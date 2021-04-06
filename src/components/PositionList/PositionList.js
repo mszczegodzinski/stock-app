@@ -18,15 +18,18 @@ const PositionList = ({
   allOpenPositionsFiltered,
   saveOpenPositions,
   allOpenPositions,
+  companySymbol,
 }) => {
   const maxPositionsOnPage = 4;
 
   const handleCheckPosition = (e) => {
     const currentClickedIndex = parseInt(e.target.name);
-    const positionToCompareIndex = allOpenPositionsFiltered.findIndex(
-      (el) => el["isChecked"] === true
+    const positionToCompareIndex = allOpenPositions.findIndex(
+      (el) => el["isChecked"] === true && el["symbol"] === companySymbol
     );
-
+    const positionToCompare = allOpenPositions.find(
+      (el) => el["isChecked"] === true && el["symbol"] === companySymbol
+    );
     // disable checkbox for all positions:
     const result = allOpenPositions.map((el) => {
       el.isChecked = false;
@@ -59,7 +62,7 @@ const PositionList = ({
   };
 
   const renderRows = () => {
-    const res = allOpenPositionsFiltered.map((el, i) => {
+    const res = allOpenPositions.map((el, i) => {
       return (
         <Grid
           {...utils.getGridCenteredProps(12)}
@@ -72,7 +75,7 @@ const PositionList = ({
               checkedIcon={<CheckBoxIcon fontSize="small" />}
               color="default"
               onChange={(e) => handleCheckPosition(e)}
-              checked={allOpenPositionsFiltered[i]["isChecked"]}
+              checked={allOpenPositions[i]["isChecked"]}
               name={`${i}`}
             />
           </Grid>
@@ -94,13 +97,11 @@ const PositionList = ({
   const renderSwipeableList = () => {
     const elHeight = 38;
     const currentSize =
-      allOpenPositionsFiltered.length < maxPositionsOnPage
-        ? allOpenPositionsFiltered.length * elHeight
-        : 152;
+      allOpenPositions.length < maxPositionsOnPage ? allOpenPositions.length * elHeight : 152;
     return (
       <FixedSizeList
         height={showPositionInfo ? currentSize : 0}
-        itemSize={allOpenPositionsFiltered.length}
+        itemSize={allOpenPositions.length}
         itemCount={1}
         style={{ width: "100%" }}
       >
