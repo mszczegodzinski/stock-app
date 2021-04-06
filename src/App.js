@@ -9,16 +9,7 @@ const App = () => {
     <Router>
       <div>
         <Switch>
-          <Route exact path="/stock-app/dashboard">
-            <div
-              className="App"
-              style={{ height: "100vh", display: "flex", flexDirection: "column" }}
-            >
-              <Dashboard />
-              <Footer />
-            </div>
-          </Route>
-          <Route exact path="/stock-app">
+          <Route exact path="/">
             <div
               className="App"
               style={{ height: "100vh", display: "flex", flexDirection: "column" }}
@@ -27,8 +18,14 @@ const App = () => {
               <Footer />
             </div>
           </Route>
-          <Route path="*">
-            <Redirect to="/stock-app" />
+          <Route path="/dashboard">
+            <div
+              className="App"
+              style={{ height: "100vh", display: "flex", flexDirection: "column" }}
+            >
+              <Dashboard />
+              <Footer />
+            </div>
           </Route>
         </Switch>
       </div>

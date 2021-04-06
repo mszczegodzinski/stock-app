@@ -41,7 +41,7 @@ const HomePage = () => {
           <Grid {...utils.getGridCenteredProps(12)} style={{ margin: "25px 0 10px 0" }}>
             <Button variant="outlined">
               <Link
-                to="/stock-app/dashboard"
+                to="/dashboard"
                 style={{
                   textDecoration: "none",
                   color: "#333",
